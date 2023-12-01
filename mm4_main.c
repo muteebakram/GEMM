@@ -61,8 +61,20 @@ int main(int argc, char *argv[])
   int i, j, k, nt, trial, max_threads, num_cases;
   int nthreads[3];
   int Ni, Nj, Nk;
-  printf("Specify Matrix dimension Ni, Nj, Nk: ");
-  scanf("%d %d %d", &Ni, &Nj, &Nk);
+
+  // printf("Specify Matrix dimension Ni, Nj, Nk: ");
+  // scanf("%d %d %d", &Ni, &Nj, &Nk);
+  if (argc != 4)
+  {
+    printf("Invalid # of args. Expected 3 arguments Ni, Nj, Nk.\n");
+    exit(1);
+  }
+
+  Ni = atoi(argv[1]);
+  Nj = atoi(argv[2]);
+  Nk = atoi(argv[3]);
+  printf("Matrix dimension Ni: %d, Nj %d, Nk: %d\n", Ni, Nj, Nk);
+
   A = (float *)malloc(sizeof(float) * Ni * Nk);
   B = (float *)malloc(sizeof(float) * Nk * Nj);
   C = (float *)malloc(sizeof(float) * Ni * Nj);
@@ -84,6 +96,7 @@ int main(int argc, char *argv[])
   nthreads[2] = max_threads - 1;
   for (int version = 0; version < 4; version++)
   {
+    printf("\n");
     switch (version)
     {
     case 0:
@@ -142,7 +155,7 @@ int main(int argc, char *argv[])
         for (i = 0; i < Ni; i++)
           for (j = 0; j < Nj; j++)
             C[i * Nj + j] = 0;
-        
+
         tstart = omp_get_wtime();
         switch (version)
         {
@@ -159,14 +172,14 @@ int main(int argc, char *argv[])
           aTbT_par(A, B, C, Ni, Nj, Nk);
           break;
         }
-        
+
         telapsed = omp_get_wtime() - tstart;
         if (telapsed < mint_par[nt])
           mint_par[nt] = telapsed;
-        
+
         if (telapsed > maxt_par[nt])
           maxt_par[nt] = telapsed;
-        
+
         for (int l = 0; l < Ni * Nj; l++)
           if (fabs((C[l] - Cref[l]) / Cref[l]) > threshold)
           {
@@ -192,16 +205,31 @@ int main(int argc, char *argv[])
     }
     for (nt = 0; nt < num_cases - 1; nt++)
       printf("%d/", nthreads[nt]);
-    printf(" using %d threads\n", nthreads[num_cases - 1]);
+    printf("%d using threads\n", nthreads[num_cases - 1]);
 
-    printf("Best Performance (GFLOPS): ");
+    // printf("Best Performance (GFLOPS): ");
+    // for (nt = 0; nt < num_cases; nt++)
+    //   printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / mint_par[nt]);
+    // printf("\n");
+
+    // printf("Worst Performance (GFLOPS): ");
+    // for (nt = 0; nt < num_cases; nt++)
+    //   printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / maxt_par[nt]);
+
+    printf("Best Performance  (GFLOPS || Speedup): ");
     for (nt = 0; nt < num_cases; nt++)
       printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / mint_par[nt]);
-    printf("\n");
+    printf("|| ");
+    for (nt = 0; nt < num_cases; nt++)
+      printf("%.2f ", maxt_seq / mint_par[nt]);
 
-    printf("Worst Performance (GFLOPS): ");
+    printf("\nWorst Performance (GFLOPS || Speedup): ");
     for (nt = 0; nt < num_cases; nt++)
       printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / maxt_par[nt]);
+    printf("|| ");
+    for (nt = 0; nt < num_cases; nt++)
+      printf("%.2f ", mint_seq / maxt_par[nt]);
+
     printf("\n");
   }
 }
