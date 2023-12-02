@@ -1,21 +1,23 @@
 #!/bin/bash
 
 OUTPUT=openmp.txt
+GCC=gcc
+# GCC=/opt/homebrew/Cellar/llvm/17.0.4/bin/clang # Macbook Apple Silicon
 
 function run() {
-  /opt/homebrew/Cellar/llvm/17.0.4/bin/clang -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3
-  # /opt/homebrew/Cellar/llvm/17.0.4/bin/clang -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3 | tee -a $OUTPUT
+  $GCC -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3
+  # $GCC -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3 | tee -a $OUTPUT
   printf "_______________________________________________________________________________________\n\n"
 }
 
 >$OUTPUT
 
 # Multiple sizes
-run $((8 * 1024)) $((8 * 1024)) 16
-run 4096 4096 64
-run 2048 2048 256
-run 1024 1024 1024
-run 256 256 $((16 * 1024))
+# run $((8 * 1024)) $((8 * 1024)) 16
+# run 4096 4096 64
+# run 2048 2048 256
+# run 1024 1024 1024
+# run 256 256 $((16 * 1024))
 run 64 64 $((256 * 1024))
 run 16 16 $((4 * 1024 * 1024))
 

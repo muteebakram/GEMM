@@ -12,7 +12,7 @@ void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__r
 {
   int i, j, k;
 
-  if (i % 2 == 0 && k % 2 == 0)
+  if (i % 2 == 0 && j % 2 == 0 && k % 2 == 0)
   {
 #pragma omp parallel for schedule(dynamic) private(i, j, k)
     for (i = 0; i < Ni; i += 2)
@@ -50,6 +50,38 @@ void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__r
   //       // C[i][j] = C[i][j] + A[i][k]*B[k][j];
   //       C[i * Nj + j] = C[i * Nj + j] + A[i * Nk + k] * B[k * Nj + j];
 }
+
+// void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
+// {
+//   int i, j, k, kt;
+//   //   for (i = 0; i < Ni; i++)
+//   //     for (j = 0; j < Nj; j++)
+//   //     {
+//   //       float c_sum = C[i * Nj + j];
+//   // #pragma omp parallel for schedule(dynamic) reduction(+ : c_sum)
+//   //       for (k = 0; k < Nk; k++)
+//   //         // C[i][j] = C[i][j] + A[i][k]*B[k][j];
+//   //         c_sum += A[i * Nk + k] * B[k * Nj + j];
+//   //       C[i * Nj + j] = c_sum;
+//   //     }
+//   for (i = 0; i < Ni; i++)
+//   {
+//     for (kt = 0; kt < Nk; kt += 32)
+//       for (k = kt; k < kt + 32; k++)
+//       {
+//         int ik = i * Nk + k;
+//         float Aik = A[ik];
+//         // float Ai1k = A[ik + Nk];
+
+//         // float Aik1 = A[ik + 1];
+//         // float Ai1k1 = A[ik + Nk + 1];
+//         for (j = 0; j < Nj; j++)
+//         { // C[i][j] = C[i][j] + A[i][k]*B[k][j];
+//           C[i * Nj + j] += Aik * B[k * Nj + j];
+//         }
+//       }
+//   }
+// }
 
 void aTb_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
