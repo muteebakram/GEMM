@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
   Ni = atoi(argv[1]);
   Nj = atoi(argv[2]);
   Nk = atoi(argv[3]);
+  printf("_______________________________________________________________________________________\n\n");
   printf("Matrix dimension Ni: %d, Nj %d, Nk: %d\n", Ni, Nj, Nk);
 
   A = (float *)malloc(sizeof(float) * Ni * Nk);
@@ -185,6 +186,22 @@ int main(int argc, char *argv[])
           if (fabs((C[l] - Cref[l]) / Cref[l]) > threshold)
           {
             printf("Error: mismatch at linearized index %d, was: %f, should be: %f\n", l, C[l], Cref[l]);
+            printf("\nMatrix C Ref:\n\n");
+            for (int l = 0; l < Ni * Nj; l++)
+            {
+              printf("%.0f  ", Cref[l]);
+              if (l != 0 && l % Ni * Nj == 0)
+                printf("\n");
+            }
+
+            printf("\n");
+            printf("\nMatrix C:\n\n");
+            for (int l = 0; l < Ni * Nj; l++)
+            {
+              printf("%.0f  ", C[l]);
+              if (l != 0 && l % Ni * Nj == 0)
+                printf("\n");
+            }
             return -1;
           }
       }

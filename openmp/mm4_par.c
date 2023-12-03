@@ -1,87 +1,148 @@
-/*
-1. First optimization - loop permutation
-2. But loop permutation with inner loop size more where to put openmp pragma?
-3.
-*/
+#include <stdio.h>
 
-// 1. Perform loop transform form ijk to ikj.
-// 2. Unroll i loop by 2
-// 3. Unroll k loop by 2
-// 4. Use scalar values for A matrix.
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
 void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
   int i, j, k;
 
-  if (i % 2 == 0 && j % 2 == 0 && k % 2 == 0)
+  if (Ni * Nj > 4 * Nk)
   {
-#pragma omp parallel for schedule(dynamic) private(i, j, k)
-    for (i = 0; i < Ni; i += 2)
+    if (Nk % 2 == 0)
     {
-      for (k = 0; k < Nk; k += 2)
+      // printf("1\n");
+      // 1. Loop permutation to ikj; 2. Loop k unroll 2; 3. Use scalar variables.
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+      for (i = 0; i < Ni; i++)
       {
-        int ik = i * Nk + k;
-        float Aik = A[ik];
-        float Ai1k = A[ik + Nk];
+        int i_Nj = i * Nj;
+        int i_Nk = i * Nk;
 
-        float Aik1 = A[ik + 1];
-        float Ai1k1 = A[ik + Nk + 1];
-
-        for (j = 0; j < Nj; j++)
+        for (k = 0; k < Nk; k += 2)
         {
-          // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-          int ij = i * Nj + j;
-          int kj = k * Nj + j;
+          int k_Nj = k * Nj;
+          const float *A_i_k = &A[i_Nk + k];
 
-          C[ij] += Aik * B[kj];
-          C[ij] += Aik1 * B[kj + Nj];
+          for (j = 0; j < Nj; j++)
+          {
+            C[i_Nj + j] += *A_i_k * B[k_Nj + j];
+            C[i_Nj + j] += *(A_i_k + 1) * B[k_Nj + Nj + j];
+          }
+        }
+      }
+    }
+    else
+    {
+      // printf("2\n");
+      // 1. Loop permutation to ikj; 2. Loop k unroll by 9 with remainder; 3. Use scalar variables.
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+      for (i = 0; i < Ni; i++)
+      {
+        int i_Nj = i * Nj; // i * Nj
+        int i_Nk = i * Nk; // i * Nk
 
-          C[ij + Nj] += Ai1k * B[kj];
-          C[ij + Nj] += Ai1k1 * B[kj + Nj];
+        int rem = Nk % 9;
+        for (k = 0; k < rem; k++)
+          for (j = 0; j < Nj; j++)
+            C[i * Nj + j] += A[i * Nk + k] * B[k * Nj + j];
+
+        for (k = rem; k < Nk; k += 9)
+        {
+          int k_Nj = k * Nj; // k * Nj
+          const float *A_i_k = &A[i_Nk + k];
+
+          for (j = 0; j < Nj; j++)
+          {
+            int i_Nj_j = i_Nj + j; // i * Nj + j
+            int k_Nj_j = k_Nj + j; // k * Nj + j
+
+            C[i_Nj_j] += *A_i_k * B[k_Nj_j]; // A[i * Nk + k] * B[k * Nj + j]
+            C[i_Nj_j] += *(A_i_k + 1) * B[k_Nj_j + (1 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 2) * B[k_Nj_j + (2 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 3) * B[k_Nj_j + (3 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 4) * B[k_Nj_j + (4 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 5) * B[k_Nj_j + (5 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 6) * B[k_Nj_j + (6 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 7) * B[k_Nj_j + (7 * Nj)];
+            C[i_Nj_j] += *(A_i_k + 8) * B[k_Nj_j + (8 * Nj)];
+          }
         }
       }
     }
   }
+  else
+  {
+    if (Nk % 2 == 0)
+    {
+      // printf("3\n");
+      // 1. Loop permutation to ikj; 2. Tile Loop k by 32; 3. Loop k unroll by 8; 4. Use scalar variables.
+      // TODO Still need improve when Nk >>> Ni * Nj
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+      for (i = 0; i < Ni; i++)
+      {
+        int i_Nj = i * Nj; // i * Nj
+        int i_Nk = i * Nk; // i * Nk
 
-  // When k is very large it has to be outer loop and parallelized?
-  // int i, j, k;
-  // for (k = 0; k < Nk; k++)
-  //   for (j = 0; j < Nj; j++)
-  //     for (i = 0; i < Ni; i++)
-  //       // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-  //       C[i * Nj + j] = C[i * Nj + j] + A[i * Nk + k] * B[k * Nj + j];
+        int TILE_SIZE = 32;
+        for (int kt = 0; kt < Nk; kt += TILE_SIZE)
+          for (k = kt; k < kt + TILE_SIZE; k += 8)
+          {
+            int k_Nj = k * Nj; // k * Nj
+            const float *A_i_k = &A[i_Nk + k];
+
+            for (j = 0; j < Nj; j++)
+            {
+              int i_Nj_j = i_Nj + j; // i * Nj + j
+              int k_Nj_j = k_Nj + j; // k * Nj + j
+
+              C[i_Nj_j] += *A_i_k * B[k_Nj_j];  // A[i * Nk + k] * B[k * Nj + j]
+              C[i_Nj_j] += *(A_i_k + 1) * B[k_Nj_j + (1 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 2) * B[k_Nj_j + (2 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 3) * B[k_Nj_j + (3 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 4) * B[k_Nj_j + (4 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 5) * B[k_Nj_j + (5 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 6) * B[k_Nj_j + (6 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 7) * B[k_Nj_j + (7 * Nj)];
+            }
+          }
+      }
+    }
+    else
+    {
+      // printf("4\n");
+      // 1. Loop permutation to ikj; 2. Tile Loop k by 36; 3. Loop k unroll by 9; 4. Use scalar variables.
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+      for (i = 0; i < Ni; i++)
+      {
+        int i_Nj = i * Nj; // i * Nj
+        int i_Nk = i * Nk; // i * Nk
+
+        for (int kt = 0; kt < Nk; kt += 36)
+          for (k = kt; k < min(kt + 36, Nk); k += 9)
+          {
+            int k_Nj = k * Nj; // k * Nj
+            const float *A_i_k = &A[i_Nk + k];
+
+            for (j = 0; j < Nj; j++)
+            {
+              int i_Nj_j = i_Nj + j; // i * Nj + j
+              int k_Nj_j = k_Nj + j; // k * Nj + j
+
+              C[i_Nj_j] += *A_i_k * B[k_Nj_j]; // A[i * Nk + k] * B[k * Nj + j]
+              C[i_Nj_j] += *(A_i_k + 1) * B[k_Nj_j + (1 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 2) * B[k_Nj_j + (2 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 3) * B[k_Nj_j + (3 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 4) * B[k_Nj_j + (4 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 5) * B[k_Nj_j + (5 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 6) * B[k_Nj_j + (6 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 7) * B[k_Nj_j + (7 * Nj)];
+              C[i_Nj_j] += *(A_i_k + 8) * B[k_Nj_j + (8 * Nj)];
+            }
+          }
+      }
+    }
+  }
 }
-
-// void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
-// {
-//   int i, j, k, kt;
-//   //   for (i = 0; i < Ni; i++)
-//   //     for (j = 0; j < Nj; j++)
-//   //     {
-//   //       float c_sum = C[i * Nj + j];
-//   // #pragma omp parallel for schedule(dynamic) reduction(+ : c_sum)
-//   //       for (k = 0; k < Nk; k++)
-//   //         // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-//   //         c_sum += A[i * Nk + k] * B[k * Nj + j];
-//   //       C[i * Nj + j] = c_sum;
-//   //     }
-//   for (i = 0; i < Ni; i++)
-//   {
-//     for (kt = 0; kt < Nk; kt += 32)
-//       for (k = kt; k < kt + 32; k++)
-//       {
-//         int ik = i * Nk + k;
-//         float Aik = A[ik];
-//         // float Ai1k = A[ik + Nk];
-
-//         // float Aik1 = A[ik + 1];
-//         // float Ai1k1 = A[ik + Nk + 1];
-//         for (j = 0; j < Nj; j++)
-//         { // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-//           C[i * Nj + j] += Aik * B[k * Nj + j];
-//         }
-//       }
-//   }
-// }
 
 void aTb_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
