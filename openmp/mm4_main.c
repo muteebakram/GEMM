@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   nthreads[2] = max_threads - 1;
   for (int version = 0; version < 4; version++)
   {
-    version = 0;
+    version = 1;
     printf("\n");
     switch (version)
     {
@@ -186,22 +186,22 @@ int main(int argc, char *argv[])
           if (fabs((C[l] - Cref[l]) / Cref[l]) > threshold)
           {
             printf("Error: mismatch at linearized index %d, was: %f, should be: %f\n", l, C[l], Cref[l]);
-            printf("\nMatrix C Ref:\n\n");
-            for (int l = 0; l < Ni * Nj; l++)
-            {
-              printf("%.0f  ", Cref[l]);
-              if (l != 0 && l % Ni * Nj == 0)
-                printf("\n");
-            }
+            // printf("\nMatrix C Ref:\n\n");
+            // for (int l = 0; l < Ni * Nj; l++)
+            // {
+            //   printf("%.0f  ", Cref[l]);
+            //   if (l != 0 && l % Ni * Nj == 0)
+            //     printf("\n");
+            // }
 
-            printf("\n");
-            printf("\nMatrix C:\n\n");
-            for (int l = 0; l < Ni * Nj; l++)
-            {
-              printf("%.0f  ", C[l]);
-              if (l != 0 && l % Ni * Nj == 0)
-                printf("\n");
-            }
+            // printf("\n");
+            // printf("\nMatrix C:\n\n");
+            // for (int l = 0; l < Ni * Nj; l++)
+            // {
+            //   printf("%.0f  ", C[l]);
+            //   if (l != 0 && l % Ni * Nj == 0)
+            //     printf("\n");
+            // }
             return -1;
           }
       }

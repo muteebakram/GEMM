@@ -95,7 +95,7 @@ void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__r
               int i_Nj_j = i_Nj + j; // i * Nj + j
               int k_Nj_j = k_Nj + j; // k * Nj + j
 
-              C[i_Nj_j] += *A_i_k * B[k_Nj_j];  // A[i * Nk + k] * B[k * Nj + j]
+              C[i_Nj_j] += *A_i_k * B[k_Nj_j]; // A[i * Nk + k] * B[k * Nj + j]
               C[i_Nj_j] += *(A_i_k + 1) * B[k_Nj_j + (1 * Nj)];
               C[i_Nj_j] += *(A_i_k + 2) * B[k_Nj_j + (2 * Nj)];
               C[i_Nj_j] += *(A_i_k + 3) * B[k_Nj_j + (3 * Nj)];
@@ -146,13 +146,79 @@ void ab_par(const float *__restrict__ A, const float *__restrict__ B, float *__r
 
 void aTb_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  int i, j, k;
+  int i, j, k, kt;
+  if ((Ni * Nj > 4 * Nk) && Nk % 2 == 0)
+  {
+    // printf("1\n");
 #pragma omp parallel for schedule(dynamic) private(i, j, k)
-  for (i = 0; i < Ni; i++)
-    for (k = 0; k < Nk; k++)
-      for (j = 0; j < Nj; j++)
-        // C[i][j] = C[i][j] + A[k][i]*B[k][j];
-        C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+    for (i = 0; i < Ni; i++)
+    {
+      for (k = 0; k < Nk; k += 2)
+        for (j = 0; j < Nj; j++)
+        {
+          // C[i][j] = C[i][j] + A[k][i]*B[k][j];
+          C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+          C[i * Nj + j] += A[(k + 1) * Ni + i] * B[(k + 1) * Nj + j];
+        }
+    }
+  }
+  else if ((Ni * Nj > 4 * Nk) && Nk % 2 != 0)
+  {
+    // printf("2\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+    for (i = 0; i < Ni; i++)
+    {
+      int rem = Nk % 3;
+      for (k = 0; k < rem; k++)
+        for (j = 0; j < Nj; j++)
+        {
+          // C[i][j] = C[i][j] + A[k][i]*B[k][j];
+          C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+        }
+      for (k = rem; k < Nk; k += 3)
+        for (j = 0; j < Nj; j++)
+        {
+          // C[i][j] = C[i][j] + A[k][i]*B[k][j];
+          C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+          C[i * Nj + j] += A[(k + 1) * Ni + i] * B[(k + 1) * Nj + j];
+          C[i * Nj + j] += A[(k + 2) * Ni + i] * B[(k + 2) * Nj + j];
+        }
+    }
+  }
+  else if ((Ni * Nj <= 4 * Nk))
+  {
+    // printf("3\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k, kt)
+    for (i = 0; i < Ni; i++)
+    {
+      int TILE_SIZE = 32;
+      for (int kt = 0; kt < Nk; kt += TILE_SIZE)
+        for (k = kt; k < min(kt + TILE_SIZE, Nk); k += 4)
+          for (j = 0; j < Nj; j++)
+          {
+            // C[i][j] = C[i][j] + A[k][i]*B[k][j];
+            C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+            C[i * Nj + j] += A[(k + 1) * Ni + i] * B[(k + 1) * Nj + j];
+            C[i * Nj + j] += A[(k + 2) * Ni + i] * B[(k + 2) * Nj + j];
+            C[i * Nj + j] += A[(k + 3) * Ni + i] * B[(k + 3) * Nj + j];
+            // C[i * Nj + j] += A[(k + 4) * Ni + i] * B[(k + 4) * Nj + j];
+            // C[i * Nj + j] += A[(k + 5) * Ni + i] * B[(k + 5) * Nj + j];
+            // C[i * Nj + j] += A[(k + 6) * Ni + i] * B[(k + 6) * Nj + j];
+            // C[i * Nj + j] += A[(k + 7) * Ni + i] * B[(k + 7) * Nj + j];
+            // C[i * Nj + j] += A[(k + 8) * Ni + i] * B[(k + 8) * Nj + j];
+          }
+    }
+  }
+  else
+  {
+    // printf("3\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+    for (i = 0; i < Ni; i++)
+      for (k = 0; k < Nk; k++)
+        for (j = 0; j < Nj; j++)
+          // C[i][j] = C[i][j] + A[k][i]*B[k][j];
+          C[i * Nj + j] += A[k * Ni + i] * B[k * Nj + j];
+  }
 }
 
 void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)

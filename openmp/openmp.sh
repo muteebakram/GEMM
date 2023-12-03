@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT=openmp.txt
+OUTPUT=AtB_result.txt
 GCC=gcc
 # GCC=/opt/homebrew/Cellar/llvm/17.0.4/bin/clang # Macbook Apple Silicon
 
