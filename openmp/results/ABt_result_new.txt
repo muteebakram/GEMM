@@ -1,0 +1,13 @@
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 64, Nj 64, Nk: 262144
+Max Threads (from omp_get_max_threads) = 16
+
+A x Bt  Reference sequential performance for ABT (in GFLOPS) Min: 2.27; Max: 2.27
+3
+3
+3
+3
+3
+3
+Error: mismatch at linearized index 0, was: 301346281404096877428736.000000, should be: 301338733371121404477440.000000
