@@ -282,24 +282,24 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   {
     printf("3\n");
     // float sum1;
-//     for (i = 0; i < Ni; i++)
-//       for (j = 0; j < Nj; j++)
-//       {
-//         sum1 = 0;
-// // #pragma omp parallel for schedule(dynamic) firstprivate(i, j)
-// // #pragma omp simd
-// #pragma omp parallel for schedule(dynamic)  reduction(+ : sum1)
-//         for (k = 0; k < Nk; k++)
-//         {
-//           // C[i][j] = C[i][j] + A[i][k]*B[j][k];
-//           sum1 += A[i * Nk + k] * B[j * Nk + k];
-//         }
-//         C[i * Nj + j] = sum1;
-//       }
+    //     for (i = 0; i < Ni; i++)
+    //       for (j = 0; j < Nj; j++)
+    //       {
+    //         sum1 = 0;
+    // // #pragma omp parallel for schedule(dynamic) firstprivate(i, j)
+    // // #pragma omp simd
+    // #pragma omp parallel for schedule(dynamic)  reduction(+ : sum1)
+    //         for (k = 0; k < Nk; k++)
+    //         {
+    //           // C[i][j] = C[i][j] + A[i][k]*B[j][k];
+    //           sum1 += A[i * Nk + k] * B[j * Nk + k];
+    //         }
+    //         C[i * Nj + j] = sum1;
+    //       }
   }
   //   int TILE = 32;
 
-    // float sum1;
+  // float sum1;
 
   // #pragma omp parallel for schedule(dynamic) private(it, jt) reduction(+ : sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8)
   //   for (it = 0; it < Ni; it += TILE)
@@ -524,10 +524,35 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
 void aTbT_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
   int i, j, k;
+
+  if ((Ni >= Nj) && (Ni >= Nk)) // Ni > Nk
+  {
+    printf("1\n");
 #pragma omp parallel for schedule(dynamic) private(i, j, k)
-  for (i = 0; i < Ni; i++)
-    for (j = 0; j < Nj; j++)
+    for (i = 0; i < Ni; i++)
+      for (j = 0; j < Nj; j++)
+        for (k = 0; k < Nk; k++)
+          // C[i][j] += A[k][i]*B[j][k];
+          C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+  }
+  else if ((Nj >= Ni) && (Nj >= Nk)) // Nj > Nk; Will not enter for given cases.
+  {
+    printf("2\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+    for (i = 0; i < Ni; i++)
+      for (j = 0; j < Nj; j++)
+        for (k = 0; k < Nk; k++)
+          // C[i][j] += A[k][i]*B[j][k];
+          C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+  }
+  else // Nk > Ni
+  {
+    printf("3\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+    for (i = 0; i < Ni; i++)
       for (k = 0; k < Nk; k++)
-        // C[i][j] += A[k][i]*B[j][k];
-        C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+        for (j = 0; j < Nj; j++)
+          // C[i][j] += A[k][i]*B[j][k];
+          C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+  }
 }

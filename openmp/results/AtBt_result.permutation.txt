@@ -1,0 +1,312 @@
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8192, Nj 8192, Nk: 16
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 3.32; Max: 3.33
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 3.22 22.51 25.87 || 0.97 6.79 7.80 
+	Worst Performance (GFLOPS || Speedup): 3.19 22.29 25.61 || 0.96 6.69 7.69 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 4096, Nj 4096, Nk: 64
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.77; Max: 1.79
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.74 11.77 17.58 || 0.98 6.64 9.91 
+	Worst Performance (GFLOPS || Speedup): 1.73 11.74 17.40 || 0.97 6.56 9.72 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2048, Nj 2048, Nk: 256
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.57; Max: 1.57
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.54 9.23 15.26 || 0.98 5.88 9.73 
+	Worst Performance (GFLOPS || Speedup): 1.53 9.20 14.96 || 0.97 5.85 9.51 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 1024, Nj 1024, Nk: 1024
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.46; Max: 1.52
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.55 9.38 15.06 || 1.06 6.42 10.30 
+	Worst Performance (GFLOPS || Speedup): 1.40 9.35 15.02 || 0.93 6.17 9.91 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 256, Nj 256, Nk: 16384
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 0.95; Max: 1.01
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.51 9.20 16.02 || 1.58 9.63 16.78 
+	Worst Performance (GFLOPS || Speedup): 1.45 9.14 15.56 || 1.44 9.08 15.46 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 64, Nj 64, Nk: 262144
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 0.39; Max: 0.41
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 0.87 4.11 8.74 || 2.24 10.60 22.51 
+	Worst Performance (GFLOPS || Speedup): 0.86 3.94 8.33 || 2.08 9.57 20.26 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 16, Nj 16, Nk: 4194304
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 0.71; Max: 0.73
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.96 4.10 6.90 || 2.75 5.75 9.65 
+	Worst Performance (GFLOPS || Speedup): 1.94 3.84 6.43 || 2.66 5.26 8.81 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8991, Nj 8991, Nk: 37
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 3.59; Max: 3.59
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 3.53 24.61 34.95 || 0.98 6.86 9.74 
+	Worst Performance (GFLOPS || Speedup): 3.53 24.13 34.91 || 0.98 6.72 9.72 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2997, Nj 2997, Nk: 111
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 2.88; Max: 2.88
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 2.56 17.80 31.91 || 0.89 6.19 11.10 
+	Worst Performance (GFLOPS || Speedup): 2.56 17.78 31.84 || 0.89 6.17 11.06 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 999, Nj 999, Nk: 999
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 2.28; Max: 2.31
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 2.17 13.45 21.94 || 0.95 5.90 9.61 
+	Worst Performance (GFLOPS || Speedup): 2.13 13.09 21.72 || 0.92 5.68 9.42 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 333, Nj 333, Nk: 8991
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.25; Max: 1.27
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 6.24 28.27 46.99 || 4.97 22.54 37.47 
+	Worst Performance (GFLOPS || Speedup): 6.14 25.89 45.56 || 4.82 20.35 35.81 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 111, Nj 111, Nk: 80919
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.04; Max: 1.04
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 1.97 10.26 23.29 || 1.90 9.90 22.46 
+	Worst Performance (GFLOPS || Speedup): 1.90 8.86 16.58 || 1.82 8.49 15.87 
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 37, Nj 37, Nk: 80919
+Max Threads (from omp_get_max_threads) = 16
+
+At x Bt Reference sequential performance for ATBT (in GFLOPS) Min: 1.32; Max: 1.36
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+	Performance of parallel version for ATBT (in GFLOPS) 1/7/15 using threads
+	Best Performance  (GFLOPS || Speedup): 3.98 8.52 14.93 || 3.02 6.46 11.32 
+	Worst Performance (GFLOPS || Speedup): 3.83 8.27 13.58 || 2.80 6.06 9.95 

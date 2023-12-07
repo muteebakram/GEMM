@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   nthreads[2] = max_threads - 1;
   for (int version = 0; version < 4; version++)
   {
-    version = 2;
+    version = 3;
     printf("\n");
     switch (version)
     {
@@ -209,16 +209,16 @@ int main(int argc, char *argv[])
     switch (version)
     {
     case 0:
-      printf("\tPerformance (Best & Worst) of parallel version for AB (in GFLOPS) ");
+      printf("\tPerformance of parallel version for AB (in GFLOPS) ");
       break;
     case 1:
-      printf("\tPerformance (Best & Worst) of parallel version for ATB (in GFLOPS) ");
+      printf("\tPerformance of parallel version for ATB (in GFLOPS) ");
       break;
     case 2:
-      printf("\tPerformance (Best & Worst) of parallel version for ABT (in GFLOPS) ");
+      printf("\tPerformance of parallel version for ABT (in GFLOPS) ");
       break;
     case 3:
-      printf("\tPerformance (Best & Worst) of parallel version for ATBT (in GFLOPS) ");
+      printf("\tPerformance of parallel version for ATBT (in GFLOPS) ");
       break;
     }
     for (nt = 0; nt < num_cases - 1; nt++)
