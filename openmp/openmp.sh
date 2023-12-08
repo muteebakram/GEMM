@@ -1,12 +1,12 @@
 #!/bin/bash
 
-
 GCC=gcc
 # GCC=/opt/homebrew/Cellar/llvm/17.0.4/bin/clang # Macbook Apple Silicon
-OUTPUT=AtBt_result_new.txt
 
-# mv $OUTPUT ABt_result_prev.txt
->$OUTPUT
+OUTPUT=AtBt_result.txt
+
+# mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
+>$OUTPUT # Clear the old contents.
 
 function run() {
   # $GCC -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3

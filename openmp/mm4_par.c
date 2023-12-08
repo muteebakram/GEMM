@@ -280,7 +280,7 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   }
   else if ((Ni * Nj <= 4 * Nk) && (Nk % 2 == 0)) // TODO Implement 3 and 4
   {
-    printf("3\n");
+    // printf("3\n");
     // float sum1;
     //     for (i = 0; i < Ni; i++)
     //       for (j = 0; j < Nj; j++)
@@ -523,21 +523,215 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
 
 void aTbT_par(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  int i, j, k;
+  int i, j, jt, k;
 
   if ((Ni >= Nj) && (Ni >= Nk)) // Ni > Nk
   {
-    printf("1\n");
-#pragma omp parallel for schedule(dynamic) private(i, j, k)
-    for (i = 0; i < Ni; i++)
-      for (j = 0; j < Nj; j++)
-        for (k = 0; k < Nk; k++)
-          // C[i][j] += A[k][i]*B[j][k];
-          C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+    if ((Nj % 8 == 0) && (Nk % 2 == 0))
+    {
+      // printf("1\n");
+
+      // #pragma omp parallel for schedule(dynamic) private(i, j, k)
+      //     for (i = 0; i < Ni; i += 2)
+      //       for (j = 0; j < Nj; j++)
+      //         for (k = 0; k < Nk; k++)
+      //         {
+      //           // C[i][j] += A[k][i]*B[j][k];
+      //           C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+      //           C[(i + 1) * Nj + j] += A[k * Ni + (i + 1)] * B[j * Nk + k];
+      //         }
+
+      // Did perform better than i 2way unroll
+      // #pragma omp parallel for schedule(dynamic) private(i, j, k)
+      //     for (i = 0; i < Ni; i++)
+      //       for (j = 0; j < Nj; j++)
+      //         for (k = 0; k < Nk; k += 2)
+      //         {
+      //           // C[i][j] += A[k][i]*B[j][k];
+      //           C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+      //           C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+      //         }
+
+      // Better than i amd k unroll
+      // #pragma omp parallel for schedule(dynamic) private(i, j, k)
+      //     for (i = 0; i < Ni; i++)
+      //       for (j = 0; j < Nj; j += 2)
+      //         for (k = 0; k < Nk; k ++)
+      //         {
+      //           // C[i][j] += A[k][i]*B[j][k];
+      //           C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+      //           C[i * Nj + (j + 1)] += A[k * Ni + i] * B[(j + 1) * Nk + k];
+      //           // C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+      //         }
+      //     int TILE = 8; // 41.72  31.02 24.65
+      // #pragma omp parallel for schedule(dynamic) private(i, j, jt, k)
+      //     for (i = 0; i < Ni; i++)
+      //       for (jt = 0; jt < Nj; jt += TILE)
+      //         for (j = jt; j < jt + TILE; j += 4)
+      //         {
+      //           for (k = 0; k < Nk; k += 2)
+      //           {
+      //             float A_k_i = A[k * Ni + i];
+      //             float A_k1_i = A[(k + 1) * Ni + i];
+
+      //             // C[i][j] += A[k][i]*B[j][k];
+      //             C[i * Nj + j] += A_k_i * B[j * Nk + k];
+      //             C[i * Nj + (j + 1)] += A_k_i * B[(j + 1) * Nk + k];
+      //             C[i * Nj + (j + 2)] += A_k_i * B[(j + 2) * Nk + k];
+      //             C[i * Nj + (j + 3)] += A_k_i * B[(j + 3) * Nk + k];
+
+      //             C[i * Nj + j] += A_k1_i * B[j * Nk + k + 1];
+      //             C[i * Nj + (j + 1)] += A_k1_i * B[(j + 1) * Nk + k + 1];
+      //             C[i * Nj + (j + 2)] += A_k1_i * B[(j + 2) * Nk + k + 1];
+      //             C[i * Nj + (j + 3)] += A_k1_i * B[(j + 3) * Nk + k + 1];
+
+      //             // C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+      //           }
+      //         }
+      // 41.79  32.15 27.02
+      // #pragma omp parallel for schedule(dynamic) private(i, j, jt, k)
+      //     for (i = 0; i < Ni; i++)
+      //       // for (jt = 0; jt < Nj; jt += TILE)
+      //       for (j = 0; j < Nj; j += 4)
+      //       {
+      //         for (k = 0; k < Nk; k += 2)
+      //         {
+      //           float A_k_i = A[k * Ni + i];
+      //           float A_k1_i = A[(k + 1) * Ni + i];
+
+      //           // C[i][j] += A[k][i]*B[j][k];
+      //           C[i * Nj + j] += A_k_i * B[j * Nk + k];
+      //           C[i * Nj + (j + 1)] += A_k_i * B[(j + 1) * Nk + k];
+      //           C[i * Nj + (j + 2)] += A_k_i * B[(j + 2) * Nk + k];
+      //           C[i * Nj + (j + 3)] += A_k_i * B[(j + 3) * Nk + k];
+
+      //           C[i * Nj + j] += A_k1_i * B[j * Nk + k + 1];
+      //           C[i * Nj + (j + 1)] += A_k1_i * B[(j + 1) * Nk + k + 1];
+      //           C[i * Nj + (j + 2)] += A_k1_i * B[(j + 2) * Nk + k + 1];
+      //           C[i * Nj + (j + 3)] += A_k1_i * B[(j + 3) * Nk + k + 1];
+
+      //           // C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+      //         }
+      //       }
+
+      float sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8;
+// 45.24 36.69 30.66
+// 59.18 48.00 40.65
+#pragma omp parallel for schedule(dynamic) private(i, j, jt, k) reduction(+ : sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8)
+      for (i = 0; i < Ni; i++)
+        // for (jt = 0; jt < Nj; jt += TILE)
+        for (j = 0; j < Nj; j += 8)
+        {
+          sum1 = 0;
+          sum2 = 0;
+          sum3 = 0;
+          sum4 = 0;
+          sum5 = 0;
+          sum6 = 0;
+          sum7 = 0;
+          sum8 = 0;
+          for (k = 0; k < Nk; k += 2)
+          {
+            float A_k_i = A[k * Ni + i];
+            float A_k1_i = A[(k + 1) * Ni + i];
+
+            // C[i][j] += A[k][i]*B[j][k];
+            sum1 += A_k_i * B[j * Nk + k];
+            sum2 += A_k_i * B[(j + 1) * Nk + k];
+            sum3 += A_k_i * B[(j + 2) * Nk + k];
+            sum4 += A_k_i * B[(j + 3) * Nk + k];
+            sum5 += A_k_i * B[(j + 4) * Nk + k];
+            sum6 += A_k_i * B[(j + 5) * Nk + k];
+            sum7 += A_k_i * B[(j + 6) * Nk + k];
+            sum8 += A_k_i * B[(j + 7) * Nk + k];
+
+            sum1 += A_k1_i * B[j * Nk + k + 1];
+            sum2 += A_k1_i * B[(j + 1) * Nk + k + 1];
+            sum3 += A_k1_i * B[(j + 2) * Nk + k + 1];
+            sum4 += A_k1_i * B[(j + 3) * Nk + k + 1];
+            sum5 += A_k1_i * B[(j + 4) * Nk + k + 1];
+            sum6 += A_k1_i * B[(j + 5) * Nk + k + 1];
+            sum7 += A_k1_i * B[(j + 6) * Nk + k + 1];
+            sum8 += A_k1_i * B[(j + 7) * Nk + k + 1];
+
+            // C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+          }
+          C[i * Nj + j] = sum1;
+          C[i * Nj + (j + 1)] = sum2;
+          C[i * Nj + (j + 2)] = sum3;
+          C[i * Nj + (j + 3)] = sum4;
+          C[i * Nj + (j + 4)] = sum5;
+          C[i * Nj + (j + 5)] = sum6;
+          C[i * Nj + (j + 6)] = sum7;
+          C[i * Nj + (j + 7)] = sum8;
+        }
+    }
+    else
+    {
+      // printf("2\n");
+      float sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9;
+#pragma omp parallel for schedule(dynamic) private(i, j, jt, k) reduction(+ : sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9)
+      for (i = 0; i < Ni; i++)
+      { // for (jt = 0; jt < Nj; jt += TILE)
+        int rem = Nj % 9;
+        for (j = 0; j < rem; j++)
+          for (k = 0; k < Nk; k++)
+            C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+
+        for (j = rem; j < Nj; j += 9)
+        {
+          sum1 = 0;
+          sum2 = 0;
+          sum3 = 0;
+          sum4 = 0;
+          sum5 = 0;
+          sum6 = 0;
+          sum7 = 0;
+          sum8 = 0;
+          sum9 = 0;
+          for (k = 0; k < Nk; k++)
+          {
+            float A_k_i = A[k * Ni + i];
+            // float A_k1_i = A[(k + 1) * Ni + i];
+
+            // C[i][j] += A[k][i]*B[j][k];
+            sum1 += A_k_i * B[j * Nk + k];
+            sum2 += A_k_i * B[(j + 1) * Nk + k];
+            sum3 += A_k_i * B[(j + 2) * Nk + k];
+            sum4 += A_k_i * B[(j + 3) * Nk + k];
+            sum5 += A_k_i * B[(j + 4) * Nk + k];
+            sum6 += A_k_i * B[(j + 5) * Nk + k];
+            sum7 += A_k_i * B[(j + 6) * Nk + k];
+            sum8 += A_k_i * B[(j + 7) * Nk + k];
+            sum9 += A_k_i * B[(j + 8) * Nk + k];
+
+            // sum1 += A_k1_i * B[j * Nk + k + 1];
+            // sum2 += A_k1_i * B[(j + 1) * Nk + k + 1];
+            // sum3 += A_k1_i * B[(j + 2) * Nk + k + 1];
+            // sum4 += A_k1_i * B[(j + 3) * Nk + k + 1];
+            // sum5 += A_k1_i * B[(j + 4) * Nk + k + 1];
+            // sum6 += A_k1_i * B[(j + 5) * Nk + k + 1];
+            // sum7 += A_k1_i * B[(j + 6) * Nk + k + 1];
+            // sum8 += A_k1_i * B[(j + 7) * Nk + k + 1];
+
+            // C[i * Nj + j] += A[(k + 1) * Ni + i] * B[j * Nk + (k + 1)];
+          }
+          C[i * Nj + j] = sum1;
+          C[i * Nj + (j + 1)] = sum2;
+          C[i * Nj + (j + 2)] = sum3;
+          C[i * Nj + (j + 3)] = sum4;
+          C[i * Nj + (j + 4)] = sum5;
+          C[i * Nj + (j + 5)] = sum6;
+          C[i * Nj + (j + 6)] = sum7;
+          C[i * Nj + (j + 7)] = sum8;
+          C[i * Nj + (j + 8)] = sum9;
+        }
+      }
+    }
   }
   else if ((Nj >= Ni) && (Nj >= Nk)) // Nj > Nk; Will not enter for given cases.
   {
-    printf("2\n");
+    // printf("3\n");
 #pragma omp parallel for schedule(dynamic) private(i, j, k)
     for (i = 0; i < Ni; i++)
       for (j = 0; j < Nj; j++)
@@ -547,12 +741,74 @@ void aTbT_par(const float *__restrict__ A, const float *__restrict__ B, float *_
   }
   else // Nk > Ni
   {
-    printf("3\n");
+    if ((Nj % 8 == 0) && (Nk % 2 == 0))
+    {
+      // printf("4\n");
 #pragma omp parallel for schedule(dynamic) private(i, j, k)
-    for (i = 0; i < Ni; i++)
-      for (k = 0; k < Nk; k++)
-        for (j = 0; j < Nj; j++)
-          // C[i][j] += A[k][i]*B[j][k];
-          C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+      for (i = 0; i < Ni; i++)
+      {
+        int iNj = i * Nj;
+        for (k = 0; k < Nk; k += 8)
+        {
+          const float *A_k_i = &A[k * Ni + i];
+
+          for (j = 0; j < Nj; j++)
+          {
+            int jNk_k = j * Nk + k;
+            float sum = C[iNj + j];
+
+            // C[i][j] += A[k][i]*B[j][k];
+            sum += *A_k_i * B[jNk_k];
+            sum += *(A_k_i + 1 * Ni) * B[jNk_k + 1];
+            sum += *(A_k_i + 2 * Ni) * B[jNk_k + 2];
+            sum += *(A_k_i + 3 * Ni) * B[jNk_k + 3];
+            sum += *(A_k_i + 4 * Ni) * B[jNk_k + 4];
+            sum += *(A_k_i + 5 * Ni) * B[jNk_k + 5];
+            sum += *(A_k_i + 6 * Ni) * B[jNk_k + 6];
+            sum += *(A_k_i + 7 * Ni) * B[jNk_k + 7];
+
+            C[iNj + j] = sum;
+          }
+        }
+      }
+    }
+    else
+    {
+      // printf("5\n");
+#pragma omp parallel for schedule(dynamic) private(i, j, k)
+      for (i = 0; i < Ni; i++)
+      {
+        int iNj = i * Nj;
+        int rem = Nk % 9;
+
+        for (k = 0; k < rem; k++)
+          for (j = 0; j < Nj; j++)
+            // C[i][j] += A[k][i]*B[j][k];
+            C[i * Nj + j] += A[k * Ni + i] * B[j * Nk + k];
+
+        for (k = rem; k < Nk; k += 9)
+        {
+          const float *A_k_i = &A[k * Ni + i];
+
+          for (j = 0; j < Nj; j++)
+          {
+            int jNk_k = j * Nk + k;
+            float sum = C[iNj + j];
+
+            sum += *A_k_i * B[jNk_k];
+            sum += *(A_k_i + 1 * Ni) * B[jNk_k + 1];
+            sum += *(A_k_i + 2 * Ni) * B[jNk_k + 2];
+            sum += *(A_k_i + 3 * Ni) * B[jNk_k + 3];
+            sum += *(A_k_i + 4 * Ni) * B[jNk_k + 4];
+            sum += *(A_k_i + 5 * Ni) * B[jNk_k + 5];
+            sum += *(A_k_i + 6 * Ni) * B[jNk_k + 6];
+            sum += *(A_k_i + 7 * Ni) * B[jNk_k + 7];
+            sum += *(A_k_i + 8 * Ni) * B[jNk_k + 8];
+
+            C[iNj + j] = sum;
+          }
+        }
+      }
+    }
   }
 }
