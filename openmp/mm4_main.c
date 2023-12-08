@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   nthreads[2] = max_threads - 1;
   for (int version = 0; version < 4; version++)
   {
-    version = 3;
+    version = 2;
     printf("\n");
     switch (version)
     {
