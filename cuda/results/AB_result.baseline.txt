@@ -1,0 +1,91 @@
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8192, Nj 8192, Nk: 16
+Block size (16, 16); Grid size (512, 512)
+Trial 0: AB GFLOPS: 208.59
+Trial 1: AB GFLOPS: 210.55
+Trial 2: AB GFLOPS: 231.66
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 4096, Nj 4096, Nk: 64
+Block size (16, 16); Grid size (256, 256)
+Trial 0: AB GFLOPS: 236.85
+Trial 1: AB GFLOPS: 240.15
+Trial 2: AB GFLOPS: 240.15
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2048, Nj 2048, Nk: 256
+Block size (16, 16); Grid size (128, 128)
+Trial 0: AB GFLOPS: 216.32
+Trial 1: AB GFLOPS: 218.51
+Trial 2: AB GFLOPS: 218.45
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 1024, Nj 1024, Nk: 1024
+Block size (16, 16); Grid size (64, 64)
+Trial 0: AB GFLOPS: 215.27
+Trial 1: AB GFLOPS: 217.45
+Trial 2: AB GFLOPS: 217.40
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 256, Nj 256, Nk: 16384
+Block size (16, 16); Grid size (16, 16)
+Trial 0: AB GFLOPS: 190.72
+Trial 1: AB GFLOPS: 180.41
+Trial 2: AB GFLOPS: 182.32
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 64, Nj 64, Nk: 262144
+Block size (16, 16); Grid size (4, 4)
+Trial 0: AB GFLOPS: 135.89
+Trial 1: AB GFLOPS: 137.36
+Trial 2: AB GFLOPS: 137.07
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 16, Nj 16, Nk: 4194304
+Block size (16, 16); Grid size (1, 1)
+Trial 0: AB GFLOPS: 10.88
+Trial 1: AB GFLOPS: 10.96
+Trial 2: AB GFLOPS: 10.96
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8991, Nj 8991, Nk: 37
+Block size (16, 16); Grid size (562, 562)
+Trial 0: AB GFLOPS: 196.90
+Trial 1: AB GFLOPS: 219.29
+Trial 2: AB GFLOPS: 219.25
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2997, Nj 2997, Nk: 111
+Block size (16, 16); Grid size (188, 188)
+Trial 0: AB GFLOPS: 250.64
+Trial 1: AB GFLOPS: 253.33
+Trial 2: AB GFLOPS: 253.19
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 999, Nj 999, Nk: 999
+Block size (16, 16); Grid size (63, 63)
+Trial 0: AB GFLOPS: 216.32
+Trial 1: AB GFLOPS: 217.91
+Trial 2: AB GFLOPS: 218.22
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 333, Nj 333, Nk: 8991
+Block size (16, 16); Grid size (21, 21)
+Trial 0: AB GFLOPS: 155.66
+Trial 1: AB GFLOPS: 152.00
+Trial 2: AB GFLOPS: 153.41
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 111, Nj 111, Nk: 80919
+Block size (16, 16); Grid size (7, 7)
+Trial 0: AB GFLOPS: 216.36
+Trial 1: AB GFLOPS: 218.84
+Trial 2: AB GFLOPS: 218.78
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 37, Nj 37, Nk: 80919
+Block size (16, 16); Grid size (3, 3)
+Trial 0: AB GFLOPS: 56.84
+Trial 1: AB GFLOPS: 57.91
+Trial 2: AB GFLOPS: 58.12
