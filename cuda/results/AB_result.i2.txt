@@ -1,0 +1,47 @@
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8192, Nj 8192, Nk: 16
+Block size (16, 16); Grid size (512, 256)
+Trial 0: AB GFLOPS: 627.64
+Trial 1: AB GFLOPS: 646.49
+Trial 2: AB GFLOPS: 698.82
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 4096, Nj 4096, Nk: 64
+Block size (16, 16); Grid size (256, 128)
+Trial 0: AB GFLOPS: 727.68
+Trial 1: AB GFLOPS: 756.45
+Trial 2: AB GFLOPS: 755.91
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2048, Nj 2048, Nk: 256
+Block size (16, 16); Grid size (128, 64)
+Trial 0: AB GFLOPS: 680.09
+Trial 1: AB GFLOPS: 707.46
+Trial 2: AB GFLOPS: 707.68
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 1024, Nj 1024, Nk: 1024
+Block size (16, 16); Grid size (64, 32)
+Trial 0: AB GFLOPS: 687.09
+Trial 1: AB GFLOPS: 707.61
+Trial 2: AB GFLOPS: 709.27
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 256, Nj 256, Nk: 16384
+Block size (16, 16); Grid size (16, 8)
+Trial 0: AB GFLOPS: 446.49
+Trial 1: AB GFLOPS: 455.56
+Trial 2: AB GFLOPS: 455.93
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 64, Nj 64, Nk: 262144
+Block size (16, 16); Grid size (4, 2)
+Trial 0: AB GFLOPS: 137.43
+Trial 1: AB GFLOPS: 138.73
+Trial 2: AB GFLOPS: 138.73
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 16, Nj 16, Nk: 4194304
+Block size (16, 16); Grid size (1, 1)
+Trial 0: AB Error: mismatch at linearized index 0, was: 2416856091510030337048576.000000, should be: 4827234205316050952650752.000000

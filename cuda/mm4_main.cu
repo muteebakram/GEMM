@@ -10,6 +10,9 @@ cudaEvent_t start, stop;
 float tstart, elapsedTime;
 
 __global__ void ab_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void ab16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void ab_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+
 __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
@@ -58,6 +61,62 @@ void aTbT_seq(const float *__restrict__ A, const float *__restrict__ B, float *_
         C[i * Nj + j] = C[i * Nj + j] + A[k * Ni + i] * B[j * Nk + k];
 }
 
+void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
+{
+  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+  if (Nk % 2 == 0)
+    if ((Ni >= 64) && (Nj >= 64))
+    {
+      dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      // printf("ab16\n");
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  else
+  {
+    if ((Ni >= 64) && (Nj >= 64))
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      // printf("ab_gpu_1\n");
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  }
+}
+
+void abT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
+{
+  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+  dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+  abT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+}
+
+void aTb_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
+{
+  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+  dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+  aTb_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+}
+
+void aTbT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
+{
+  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+  dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+  aTbT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+}
+
 int main(int argc, char *argv[])
 {
   float *h_A, *h_B, *h_C, *h_Cref, *d_A, *d_B, *d_C;
@@ -101,11 +160,6 @@ int main(int argc, char *argv[])
   cudaMemcpy(d_B, h_B, Nk * Nj * sizeof(float), cudaMemcpyHostToDevice);
   checkCUDAError("cudaMemcpy H2D transfer failure");
 
-  dim3 block(16, 16);
-  // dim3 grid(Ni / 16, Nj / 16);
-  dim3 grid(ceil(Ni / 16.0), ceil(Nj / 16.0));
-  printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-
   for (int version = 0; version < 4; version++)
   {
     for (i = 0; i < Ni; i++)
@@ -135,7 +189,6 @@ int main(int argc, char *argv[])
         for (j = 0; j < Nj; j++)
           h_C[i * Nj + j] = 0;
 
-      printf("Trial %d: ", trial);
       cudaEventCreate(&start);
       cudaEventCreate(&stop);
       cudaEventRecord(start);
@@ -144,20 +197,20 @@ int main(int argc, char *argv[])
       switch (version)
       {
       case 0:
-        ab_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
-        printf("AB ");
+        ab_launch(d_A, d_B, d_C, Ni, Nj, Nk);
+        printf("Trial %d: AB ", trial);
         break;
       case 1:
-        aTb_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
-        printf("ATB ");
+        aTb_launch(d_A, d_B, d_C, Ni, Nj, Nk);
+        printf("Trial %d: ATB ", trial);
         break;
       case 2:
-        abT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
-        printf("ABT ");
+        abT_launch(d_A, d_B, d_C, Ni, Nj, Nk);
+        printf("Trial %d: ABT ", trial);
         break;
       case 3:
-        aTbT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
-        printf("ATBT ");
+        aTbT_launch(d_A, d_B, d_C, Ni, Nj, Nk);
+        printf("Trial %d: ATBT ", trial);
         break;
       }
       checkCUDAError("GPU kernel launch failure");

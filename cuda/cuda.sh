@@ -1,11 +1,13 @@
 #!/bin/bash
 
 GCC=nvcc
-
 OUTPUT=AB_result_new.txt
 
-# mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
->$OUTPUT # Clear the old contents.
+# Compare previous run with new run.
+mv $OUTPUT AB_result_prev.txt
+
+# Clear the old contents.
+>$OUTPUT
 
 function run() {
   # $GCC -O3 mm4_main.cu mm4_gpu.cu && time ./a.out $1 $2 $3
