@@ -2,8 +2,8 @@
 
 GCC=nvcc
 
-OUTPUT=
-# OUTPUT=ABt_result_new.txt
+# OUTPUT=
+OUTPUT="results/CADE_results.txt"
 
 if [ ! -z "${OUTPUT}" ]; then
   # mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
@@ -34,3 +34,4 @@ run 16 16 $((4 * 1024 * 1024))
 # run 333 333 $((9 * 999))
 # run 111 111 $((81 * 999))
 # run 37 37 $((81 * 999))
+
