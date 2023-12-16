@@ -13,6 +13,10 @@ __global__ void ab_gpu(const float *__restrict__ A, const float *__restrict__ B,
 __global__ void ab16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void ab_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
+__global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTb16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTb_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+
 __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
@@ -79,7 +83,7 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     }
   else
   {
-    if ((Ni >= 64) && (Nj >= 64))
+    if ((Ni > 64) && (Nj > 64))
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
@@ -94,18 +98,70 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
   }
 }
 
-void abT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
-{
-  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
-  dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
-  abT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
-}
-
 void aTb_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
 {
   dim3 block(BLOCK_SIZE, BLOCK_SIZE);
-  dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
-  aTb_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+  if (Nk % 2 == 0)
+    if ((Ni > 64) && (Nj > 64))
+    {
+      dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+      // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  else
+  {
+    if ((Ni > 64) && (Nj > 64))
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  }
+}
+
+void abT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
+{
+  dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+  if (Nk % 2 == 0)
+    if ((Ni > 64) && (Nj > 64))
+    {
+      dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
+      // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  else
+  {
+    if ((Ni > 64) && (Nj > 64))
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+    else
+    {
+      dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
+      // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+    }
+  }
 }
 
 void aTbT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
@@ -164,7 +220,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < Nj; j++)
         h_Cref[i * Nj + j] = 0;
 
-    version = 0;
+    version = 1;
     switch (version)
     {
     case 0:
