@@ -65,17 +65,16 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
 {
   dim3 block(BLOCK_SIZE, BLOCK_SIZE);
   if (Nk % 2 == 0)
-    if ((Ni >= 64) && (Nj >= 64))
+    if ((Ni > 64) && (Nj > 64))
     {
       dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
-      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
       ab_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
-      // printf("ab16\n");
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
       ab16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   else
@@ -83,14 +82,13 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     if ((Ni >= 64) && (Nj >= 64))
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
       ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
-      // printf("ab_gpu_1\n");
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
       ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   }

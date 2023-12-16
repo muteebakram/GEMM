@@ -1,78 +1,78 @@
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 8192, Nj 8192, Nk: 16
-Trial 0: AB GFLOPS: 746.37
-Trial 1: AB GFLOPS: 786.36
-Trial 2: AB GFLOPS: 791.96
+Trial 0: AB GFLOPS: 774.78
+Trial 1: AB GFLOPS: 806.33
+Trial 2: AB GFLOPS: 807.08
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 4096, Nj 4096, Nk: 64
-Trial 0: AB GFLOPS: 1720.12
-Trial 1: AB GFLOPS: 1918.27
-Trial 2: AB GFLOPS: 1910.74
+Trial 0: AB GFLOPS: 1817.34
+Trial 1: AB GFLOPS: 2071.77
+Trial 2: AB GFLOPS: 2070.62
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 2048, Nj 2048, Nk: 256
-Trial 0: AB GFLOPS: 1829.03
-Trial 1: AB GFLOPS: 2016.07
-Trial 2: AB GFLOPS: 2028.68
+Trial 0: AB GFLOPS: 1960.70
+Trial 1: AB GFLOPS: 2187.88
+Trial 2: AB GFLOPS: 2181.41
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 1024, Nj 1024, Nk: 1024
-Trial 0: AB GFLOPS: 1793.88
-Trial 1: AB GFLOPS: 1964.95
-Trial 2: AB GFLOPS: 1966.85
+Trial 0: AB GFLOPS: 1676.34
+Trial 1: AB GFLOPS: 1799.89
+Trial 2: AB GFLOPS: 1876.54
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 256, Nj 256, Nk: 16384
-Trial 0: AB GFLOPS: 981.67
-Trial 1: AB GFLOPS: 1041.84
-Trial 2: AB GFLOPS: 1027.29
+Trial 0: AB GFLOPS: 878.10
+Trial 1: AB GFLOPS: 933.43
+Trial 2: AB GFLOPS: 926.27
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 64, Nj 64, Nk: 262144
-Trial 0: AB GFLOPS: 85.01
-Trial 1: AB GFLOPS: 85.54
-Trial 2: AB GFLOPS: 85.61
+Trial 0: AB GFLOPS: 273.19
+Trial 1: AB GFLOPS: 278.57
+Trial 2: AB GFLOPS: 278.91
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 16, Nj 16, Nk: 4194304
-Trial 0: AB GFLOPS: 19.81
-Trial 1: AB GFLOPS: 21.42
-Trial 2: AB GFLOPS: 21.86
+Trial 0: AB GFLOPS: 30.12
+Trial 1: AB GFLOPS: 30.18
+Trial 2: AB GFLOPS: 30.72
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 8991, Nj 8991, Nk: 37
-Trial 0: AB GFLOPS: 218.41
-Trial 1: AB GFLOPS: 219.27
-Trial 2: AB GFLOPS: 219.25
+Trial 0: AB GFLOPS: 218.28
+Trial 1: AB GFLOPS: 219.26
+Trial 2: AB GFLOPS: 219.24
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 2997, Nj 2997, Nk: 111
-Trial 0: AB GFLOPS: 249.82
-Trial 1: AB GFLOPS: 253.25
-Trial 2: AB GFLOPS: 253.27
+Trial 0: AB GFLOPS: 250.18
+Trial 1: AB GFLOPS: 253.29
+Trial 2: AB GFLOPS: 253.36
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 999, Nj 999, Nk: 999
-Trial 0: AB GFLOPS: 215.69
-Trial 1: AB GFLOPS: 217.91
-Trial 2: AB GFLOPS: 217.66
+Trial 0: AB GFLOPS: 216.22
+Trial 1: AB GFLOPS: 218.29
+Trial 2: AB GFLOPS: 218.62
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 333, Nj 333, Nk: 8991
-Trial 0: AB GFLOPS: 153.07
-Trial 1: AB GFLOPS: 154.88
-Trial 2: AB GFLOPS: 149.97
+Trial 0: AB GFLOPS: 151.59
+Trial 1: AB GFLOPS: 153.00
+Trial 2: AB GFLOPS: 152.12
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 111, Nj 111, Nk: 80919
-Trial 0: AB GFLOPS: 215.17
-Trial 1: AB GFLOPS: 218.72
-Trial 2: AB GFLOPS: 218.68
+Trial 0: AB GFLOPS: 215.08
+Trial 1: AB GFLOPS: 218.57
+Trial 2: AB GFLOPS: 218.76
 _______________________________________________________________________________________
 
 Matrix dimension Ni: 37, Nj 37, Nk: 80919
-Trial 0: AB GFLOPS: 56.71
-Trial 1: AB GFLOPS: 57.95
-Trial 2: AB GFLOPS: 58.10
+Trial 0: AB GFLOPS: 56.79
+Trial 1: AB GFLOPS: 58.01
+Trial 2: AB GFLOPS: 58.17

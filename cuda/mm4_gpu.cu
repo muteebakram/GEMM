@@ -90,62 +90,40 @@ __global__ void ab16_gpu(const float *__restrict__ A, const float *__restrict__ 
   if ((i < Ni) && (j < Nj))
   {
     float sum00 = 0;
-    __shared__ float sA1[BLOCK_SIZE][BLOCK_SIZE], sB1[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[16 * BLOCK_SIZE][BLOCK_SIZE];
 
-    for (int ks = 0; ks < Nk; ks += BLOCK_SIZE)
+    for (int ks = 0; ks < Nk; ks += 16 * BLOCK_SIZE)
     {
-      sA1[ty][tx] = A[i * Nk + ks + tx];
-      sB1[ty][tx] = B[(ks + ty) * Nj + j];
+      int indexA = i * Nk + ks + tx;
+      for (int m = 0; m < 16; m++)
+      {
+        sA1[ty][tx + m * BLOCK_SIZE] = A[indexA + m * BLOCK_SIZE];
+        sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
+      }
       __syncthreads();
 
-      for (int k = 0; k < BLOCK_SIZE; k += 4)
+      for (int k = 0; k < 16 * BLOCK_SIZE; k += 8)
       {
         // C[i][j] = C[i][j] + A[i][k]*B[k][j];
         sum00 += sA1[ty][k] * sB1[k][tx];
         sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
         sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];
         sum00 += sA1[ty][k + 3] * sB1[k + 3][tx];
+
+        sum00 += sA1[ty][k + 4] * sB1[k + 4][tx];
+        sum00 += sA1[ty][k + 5] * sB1[k + 5][tx];
+        sum00 += sA1[ty][k + 6] * sB1[k + 6][tx];
+        sum00 += sA1[ty][k + 7] * sB1[k + 7][tx];
       }
+      __syncthreads();
     }
+
     C[i * Nj + j] = sum00;
   }
 }
 
 __global__ void ab_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, B, C
-  // int tx = threadIdx.x;
-  // int ty = threadIdx.y;
-  // int i = blockIdx.y * blockDim.y + ty;
-  // int j = blockIdx.x * blockDim.x + tx;
-
-  // if ((i < Ni) && (j < Nj))
-  // {
-  //   float sum00 = 0;
-  //   __shared__ float sA1[BLOCK_SIZE][BLOCK_SIZE], sB1[BLOCK_SIZE][BLOCK_SIZE];
-
-  //   int rem = Nk % BLOCK_SIZE;
-
-  //   for (int k = 0; k < rem; k++)
-  //   {
-  //     // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-  //     sum00 += A[i * Nk + k] * B[k * Nk + j];
-  //   }
-
-  //   for (int ks = rem; ks < Nk; ks += BLOCK_SIZE)
-  //   {
-  //     sA1[ty][tx] = A[i * Nk + ks + tx];
-  //     sB1[ty][tx] = B[(ks + ty) * Nj + j];
-  //     __syncthreads();
-
-  //     for (int k = 0; k < BLOCK_SIZE; k++)
-  //     {
-  //       // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-  //       sum00 += sA1[ty][k] * sB1[k][tx];
-  //     }
-  //   }
-  //   C[i * Nj + j] = sum00;
-  // }
   int i = blockIdx.y * blockDim.y + threadIdx.y;
   int j = blockIdx.x * blockDim.x + threadIdx.x;
 
