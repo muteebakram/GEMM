@@ -25,7 +25,6 @@ __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ 
 __global__ void aTbT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
-
 __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
@@ -223,7 +222,7 @@ int main(int argc, char *argv[])
   Ni = atoi(argv[1]);
   Nj = atoi(argv[2]);
   Nk = atoi(argv[3]);
-  printf("_______________________________________________________________________________________\n\n");
+  printf("_______________________________________________________________________________________\n");
   printf("Matrix dimension Ni: %d, Nj %d, Nk: %d\n", Ni, Nj, Nk);
 
   h_A = (float *)malloc(sizeof(float) * Ni * Nk);
@@ -255,7 +254,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < Nj; j++)
         h_Cref[i * Nj + j] = 0;
 
-    version = 3;
+    // version = 3;
     switch (version)
     {
     case 0:
@@ -274,6 +273,9 @@ int main(int argc, char *argv[])
 
     for (int trial = 0; trial < 3; trial++)
     {
+      if (trial == 0)
+        printf("\n");
+
       for (i = 0; i < Ni; i++)
         for (j = 0; j < Nj; j++)
           h_C[i * Nj + j] = 0;
@@ -336,7 +338,7 @@ int main(int argc, char *argv[])
         }
       printf("GFLOPS: %.2f\n", 2.0e-6 * Ni * Nj * Nk / elapsedTime);
     }
-    return 0;
+    // return 0;
   }
   return 0;
 }
