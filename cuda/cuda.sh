@@ -1,10 +1,10 @@
 #!/bin/bash
 
 GCC=nvcc
-OUTPUT=ABt_result_new.txt
+OUTPUT=AtBt_result_new.txt
 
 # Compare previous run with new run.
-mv $OUTPUT ABt_result_prev.txt
+mv $OUTPUT AtBt_result_prev.txt
 
 # Clear the old contents.
 >$OUTPUT
@@ -15,11 +15,11 @@ function run() {
 }
 
 # Multiple sizes
-run $((8 * 1024)) $((8 * 1024)) 16
-run 4096 4096 64
-run 2048 2048 256
-run 1024 1024 1024
-run 256 256 $((16 * 1024))
+# run $((8 * 1024)) $((8 * 1024)) 16
+# run 4096 4096 64
+# run 2048 2048 256
+# run 1024 1024 1024
+# run 256 256 $((16 * 1024))
 run 64 64 $((256 * 1024))
 run 16 16 $((4 * 1024 * 1024))
 

@@ -20,15 +20,15 @@ __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ 
 
     for (int ks = 0; ks < Nk; ks += BLOCK_SIZE)
     {
-      sA1[ty][tx] = A[i * Nk + ks + tx];
-      sA2[ty][tx] = A[(i + 1) * Nk + ks + tx];
-      sA3[ty][tx] = A[(i + 2) * Nk + ks + tx];
-      sA4[ty][tx] = A[(i + 3) * Nk + ks + tx];
+      sA1[ty][tx] = A[(ks + tx) * Ni + i];
+      sA2[ty][tx] = A[(ks + tx) * Ni + i + 1];
+      sA3[ty][tx] = A[(ks + tx) * Ni + i + 2];
+      sA4[ty][tx] = A[(ks + tx) * Ni + i + 3];
 
-      sB1[ty][tx] = B[(ks + ty) * Nj + j];
-      sB2[ty][tx] = B[(ks + ty) * Nj + j + BLOCK_SIZE];
-      sB3[ty][tx] = B[(ks + ty) * Nj + j + 2 * BLOCK_SIZE];
-      sB4[ty][tx] = B[(ks + ty) * Nj + j + 3 * BLOCK_SIZE];
+      sB1[ty][tx] = B[j * Nk + ks + ty];
+      sB2[ty][tx] = B[(j + 1 * BLOCK_SIZE) * Nk + ks + ty];
+      sB3[ty][tx] = B[(j + 2 * BLOCK_SIZE) * Nk + ks + ty];
+      sB4[ty][tx] = B[(j + 3 * BLOCK_SIZE) * Nk + ks + ty];
       __syncthreads();
 
       for (int k = 0; k < BLOCK_SIZE; k++)
@@ -90,30 +90,31 @@ __global__ void aTbT16_gpu(const float *__restrict__ A, const float *__restrict_
   if ((i < Ni) && (j < Nj))
   {
     float sum00 = 0;
-    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[16 * BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float sA1[16 * BLOCK_SIZE][BLOCK_SIZE], sB1[BLOCK_SIZE][16 * BLOCK_SIZE];
 
     for (int ks = 0; ks < Nk; ks += 16 * BLOCK_SIZE)
     {
-      int indexA = i * Nk + ks + tx;
       for (int m = 0; m < 16; m++)
       {
-        sA1[ty][tx + m * BLOCK_SIZE] = A[indexA + m * BLOCK_SIZE];
-        sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
+        sA1[tx + m * BLOCK_SIZE][ty] = A[(ks + m * BLOCK_SIZE + tx) * Ni + i];
+        sB1[tx][ty + m * BLOCK_SIZE] = B[j * Nk + ks + ty + m * BLOCK_SIZE];
+        // sA1[ty][tx + m * BLOCK_SIZE] = A[indexA + m * BLOCK_SIZE];
+        // sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
       }
       __syncthreads();
 
       for (int k = 0; k < 16 * BLOCK_SIZE; k += 8)
       {
         // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-        sum00 += sA1[ty][k] * sB1[k][tx];
-        sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
-        sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];
-        sum00 += sA1[ty][k + 3] * sB1[k + 3][tx];
+        sum00 += sA1[k][ty] * sB1[tx][k];
+        sum00 += sA1[k + 1][ty] * sB1[tx][k + 1];
+        sum00 += sA1[k + 2][ty] * sB1[tx][k + 2];
+        sum00 += sA1[k + 3][ty] * sB1[tx][k + 3];
 
-        sum00 += sA1[ty][k + 4] * sB1[k + 4][tx];
-        sum00 += sA1[ty][k + 5] * sB1[k + 5][tx];
-        sum00 += sA1[ty][k + 6] * sB1[k + 6][tx];
-        sum00 += sA1[ty][k + 7] * sB1[k + 7][tx];
+        sum00 += sA1[k + 4][ty] * sB1[tx][k + 4];
+        sum00 += sA1[k + 5][ty] * sB1[tx][k + 5];
+        sum00 += sA1[k + 6][ty] * sB1[tx][k + 6];
+        sum00 += sA1[k + 7][ty] * sB1[tx][k + 7];
       }
       __syncthreads();
     }

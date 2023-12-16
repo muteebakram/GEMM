@@ -1,0 +1,105 @@
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 8192, Nj 8192, Nk: 16
+Trial 0: AB GFLOPS: 758.18
+Trial 1: AB GFLOPS: 798.55
+Trial 2: AB GFLOPS: 801.66
+Trial 0: ATB GFLOPS: 771.89
+Trial 1: ATB GFLOPS: 796.39
+Trial 2: ATB GFLOPS: 801.70
+Trial 0: ABT GFLOPS: 803.87
+Trial 1: ABT GFLOPS: 844.69
+Trial 2: ABT GFLOPS: 844.42
+Trial 0: ATBT GFLOPS: 805.65
+Trial 1: ATBT GFLOPS: 838.00
+Trial 2: ATBT GFLOPS: 838.60
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 4096, Nj 4096, Nk: 64
+Trial 0: AB GFLOPS: 1882.12
+Trial 1: AB GFLOPS: 2065.46
+Trial 2: AB GFLOPS: 2061.08
+Trial 0: ATB GFLOPS: 1917.72
+Trial 1: ATB GFLOPS: 2152.03
+Trial 2: ATB GFLOPS: 2147.21
+Trial 0: ABT GFLOPS: 1930.19
+Trial 1: ABT GFLOPS: 2052.13
+Trial 2: ABT GFLOPS: 2053.26
+Trial 0: ATBT GFLOPS: 1815.96
+Trial 1: ATBT GFLOPS: 1937.38
+Trial 2: ATBT GFLOPS: 1940.40
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 2048, Nj 2048, Nk: 256
+Trial 0: AB GFLOPS: 1969.33
+Trial 1: AB GFLOPS: 2188.02
+Trial 2: AB GFLOPS: 2188.31
+Trial 0: ATB GFLOPS: 1987.41
+Trial 1: ATB GFLOPS: 2236.44
+Trial 2: ATB GFLOPS: 2236.66
+Trial 0: ABT GFLOPS: 2056.28
+Trial 1: ABT GFLOPS: 2206.15
+Trial 2: ABT GFLOPS: 2208.69
+Trial 0: ATBT GFLOPS: 1872.77
+Trial 1: ATBT GFLOPS: 2003.67
+Trial 2: ATBT GFLOPS: 2002.89
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 1024, Nj 1024, Nk: 1024
+Trial 0: AB GFLOPS: 1895.14
+Trial 1: AB GFLOPS: 2134.64
+Trial 2: AB GFLOPS: 2133.76
+Trial 0: ATB GFLOPS: 2042.83
+Trial 1: ATB GFLOPS: 2197.41
+Trial 2: ATB GFLOPS: 2197.26
+Trial 0: ABT GFLOPS: 2050.82
+Trial 1: ABT GFLOPS: 2257.81
+Trial 2: ABT GFLOPS: 2185.60
+Trial 0: ATBT GFLOPS: 1881.49
+Trial 1: ATBT GFLOPS: 2006.12
+Trial 2: ATBT GFLOPS: 2008.65
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 256, Nj 256, Nk: 16384
+Trial 0: AB GFLOPS: 1044.64
+Trial 1: AB GFLOPS: 1105.31
+Trial 2: AB GFLOPS: 1098.47
+Trial 0: ATB GFLOPS: 1033.56
+Trial 1: ATB GFLOPS: 1085.24
+Trial 2: ATB GFLOPS: 1093.14
+Trial 0: ABT GFLOPS: 913.51
+Trial 1: ABT GFLOPS: 928.08
+Trial 2: ABT GFLOPS: 930.90
+Trial 0: ATBT GFLOPS: 829.82
+Trial 1: ATBT GFLOPS: 854.77
+Trial 2: ATBT GFLOPS: 855.58
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 64, Nj 64, Nk: 262144
+Trial 0: AB GFLOPS: 274.49
+Trial 1: AB GFLOPS: 278.12
+Trial 2: AB GFLOPS: 278.31
+Trial 0: ATB GFLOPS: 172.85
+Trial 1: ATB GFLOPS: 174.57
+Trial 2: ATB GFLOPS: 174.73
+Trial 0: ABT GFLOPS: 55.95
+Trial 1: ABT GFLOPS: 55.91
+Trial 2: ABT GFLOPS: 56.03
+Trial 0: ATBT GFLOPS: 50.26
+Trial 1: ATBT GFLOPS: 50.36
+Trial 2: ATBT GFLOPS: 51.79
+_______________________________________________________________________________________
+
+Matrix dimension Ni: 16, Nj 16, Nk: 4194304
+Trial 0: AB GFLOPS: 31.29
+Trial 1: AB GFLOPS: 31.35
+Trial 2: AB GFLOPS: 31.36
+Trial 0: ATB GFLOPS: 22.09
+Trial 1: ATB GFLOPS: 22.10
+Trial 2: ATB GFLOPS: 22.12
+Trial 0: ABT GFLOPS: 8.10
+Trial 1: ABT GFLOPS: 8.11
+Trial 2: ABT GFLOPS: 8.11
+Trial 0: ATBT GFLOPS: 6.84
+Trial 1: ATBT GFLOPS: 7.12
+Trial 2: ATBT GFLOPS: 7.12
