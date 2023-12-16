@@ -2,7 +2,7 @@
 
 __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, B, C
+  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = 4 * (blockIdx.y * blockDim.y + ty);
@@ -25,10 +25,11 @@ __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B
       sA3[ty][tx] = A[(i + 2) * Nk + ks + tx];
       sA4[ty][tx] = A[(i + 3) * Nk + ks + tx];
 
-      sB1[ty][tx] = B[(ks + ty) * Nj + j];
-      sB2[ty][tx] = B[(ks + ty) * Nj + j + BLOCK_SIZE];
-      sB3[ty][tx] = B[(ks + ty) * Nj + j + 2 * BLOCK_SIZE];
-      sB4[ty][tx] = B[(ks + ty) * Nj + j + 3 * BLOCK_SIZE];
+      sB1[ty][tx] = B[j * Nk + ks + ty];
+      sB2[ty][tx] = B[(j + 1 * BLOCK_SIZE) * Nk + ks + ty];
+      sB3[ty][tx] = B[(j + 2 * BLOCK_SIZE) * Nk + ks + ty];
+      sB4[ty][tx] = B[(j + 3 * BLOCK_SIZE) * Nk + ks + ty];
+
       __syncthreads();
 
       for (int k = 0; k < BLOCK_SIZE; k++)
@@ -81,7 +82,7 @@ __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B
 
 __global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, B, C
+  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = blockIdx.y * blockDim.y + ty;
@@ -90,30 +91,30 @@ __global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__
   if ((i < Ni) && (j < Nj))
   {
     float sum00 = 0;
-    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[16 * BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[BLOCK_SIZE][16 * BLOCK_SIZE];
 
     for (int ks = 0; ks < Nk; ks += 16 * BLOCK_SIZE)
     {
-      int indexA = i * Nk + ks + tx;
       for (int m = 0; m < 16; m++)
       {
-        sA1[ty][tx + m * BLOCK_SIZE] = A[indexA + m * BLOCK_SIZE];
-        sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
+        sA1[ty][tx + m * BLOCK_SIZE] = A[i * Nk + ks + tx + m * BLOCK_SIZE];
+        sB1[tx][ty + m * BLOCK_SIZE] = B[j * Nk + ks + ty + m * BLOCK_SIZE];
+        // sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
       }
       __syncthreads();
 
       for (int k = 0; k < 16 * BLOCK_SIZE; k += 8)
       {
-        // C[i][j] = C[i][j] + A[i][k]*B[k][j];
-        sum00 += sA1[ty][k] * sB1[k][tx];
-        sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
-        sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];
-        sum00 += sA1[ty][k + 3] * sB1[k + 3][tx];
+        // C[i][j] = C[i][j] + A[i][k]*B[j][k];
+        sum00 += sA1[ty][k] * sB1[tx][k];
+        sum00 += sA1[ty][k + 1] * sB1[tx][k + 1];
+        sum00 += sA1[ty][k + 2] * sB1[tx][k + 2];
+        sum00 += sA1[ty][k + 3] * sB1[tx][k + 3];
 
-        sum00 += sA1[ty][k + 4] * sB1[k + 4][tx];
-        sum00 += sA1[ty][k + 5] * sB1[k + 5][tx];
-        sum00 += sA1[ty][k + 6] * sB1[k + 6][tx];
-        sum00 += sA1[ty][k + 7] * sB1[k + 7][tx];
+        sum00 += sA1[ty][k + 4] * sB1[tx][k + 4];
+        sum00 += sA1[ty][k + 5] * sB1[tx][k + 5];
+        sum00 += sA1[ty][k + 6] * sB1[tx][k + 6];
+        sum00 += sA1[ty][k + 7] * sB1[tx][k + 7];
       }
       __syncthreads();
     }
@@ -124,7 +125,7 @@ __global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__
 
 __global__ void abT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, B, C
+  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = blockIdx.y * blockDim.y + threadIdx.y;
@@ -150,7 +151,7 @@ __global__ void abT_gpu_1(const float *__restrict__ A, const float *__restrict__
 
       for (int k = 0; k < BLOCK_SIZE; k++)
       {
-        // C[i][j] = C[i][j] + A[i][k]*B[k][j];
+        // C[i][j] = C[i][j] + A[i][k]*B[j][k];
         sum00 += sA1[ty][k] * sB1[k][tx];
         // sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
         // sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];

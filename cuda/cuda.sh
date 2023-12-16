@@ -1,10 +1,10 @@
 #!/bin/bash
 
 GCC=nvcc
-OUTPUT=AtB_result_new.txt
+OUTPUT=ABt_result_new.txt
 
 # Compare previous run with new run.
-mv $OUTPUT AtB_result_prev.txt
+mv $OUTPUT ABt_result_prev.txt
 
 # Clear the old contents.
 >$OUTPUT
