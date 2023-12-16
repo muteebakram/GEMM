@@ -3,21 +3,27 @@
 GCC=gcc
 # GCC=/opt/homebrew/Cellar/llvm/17.0.4/bin/clang # Macbook Apple Silicon
 
-OUTPUT=ABt_result_new.txt
+OUTPUT=
+# OUTPUT=ABt_result_new.txt
 
-# mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
->$OUTPUT # Clear the old contents.
+if [ ! -z "${OUTPUT}" ]; then
+  # mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
+  >$OUTPUT # Clear the old contents.
+fi
 
 function run() {
-  # $GCC -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3
-  $GCC -O3 -fopenmp mm4_main.c mm4_par.c && time ./a.out $1 $2 $3 | tee -a $OUTPUT
+  if [ ! -z "${OUTPUT}" ]; then
+    $GCC -O3 -fopenmp mm4_main.c mm4_par.c && ./a.out $1 $2 $3 | tee -a $OUTPUT
+  else
+    $GCC -O3 -fopenmp mm4_main.c mm4_par.c && ./a.out $1 $2 $3
+  fi
 }
 
 # Multiple sizes
-# run $((8 * 1024)) $((8 * 1024)) 16
-# run 4096 4096 64
-# run 2048 2048 256
-# run 1024 1024 1024
+run $((8 * 1024)) $((8 * 1024)) 16
+run 4096 4096 64
+run 2048 2048 256
+run 1024 1024 1024
 run 256 256 $((16 * 1024))
 run 64 64 $((256 * 1024))
 run 16 16 $((4 * 1024 * 1024))

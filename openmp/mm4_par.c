@@ -228,7 +228,7 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   int i, it, j, jt, k;
   if ((Ni * Nj > 4 * Nk) && Nk % 2 == 0)
   {
-    printf("1\n");
+    // printf("1\n");
     float sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9, sum10, sum11, sum12, sum13, sum14, sum15, sum16;
 #pragma omp parallel for schedule(dynamic) private(i, j, k) reduction(+ : sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9, sum10, sum11, sum12, sum13, sum14, sum15, sum16)
     for (i = 0; i < Ni; i += 4)
@@ -281,7 +281,7 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   }
   else if ((Ni * Nj > 4 * Nk) && Nk % 2 != 0)
   {
-    printf("2\n");
+    // printf("2\n");
     float sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9, sum10, sum11, sum12, sum13, sum14, sum15, sum16;
 
     int rem_i = Ni % 3;
@@ -415,7 +415,7 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   // QUESTION : how to parallelize k loop with reduction
   else if ((Ni * Nj <= 4 * Nk) && (Nk % 2 == 0)) // TODO Implement 3 and 4
   {
-    printf("3\n");
+    // printf("3\n");
     float sum1;
 #pragma omp parallel for schedule(dynamic) reduction(+ : sum1) collapse(3)
     for (i = 0; i < Ni; i++)
@@ -435,11 +435,11 @@ void abT_par(const float *__restrict__ A, const float *__restrict__ B, float *__
   }
   else if ((Ni * Nj <= 4 * Nk) && (Nk % 2 != 0))
   {
-    printf("4\n");
+    // printf("4\n");
   }
   else
   {
-    printf("5\n");
+    // printf("5\n");
   }
   //   int TILE = 32;
 
