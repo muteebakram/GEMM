@@ -25,10 +25,6 @@ __global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ 
 __global__ void aTbT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
-__global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-
 void ab_seq(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
   int i, j, k;
@@ -254,7 +250,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < Nj; j++)
         h_Cref[i * Nj + j] = 0;
 
-    // version = 3;
+    version = 3;
     switch (version)
     {
     case 0:
@@ -338,7 +334,7 @@ int main(int argc, char *argv[])
         }
       printf("GFLOPS: %.2f\n", 2.0e-6 * Ni * Nj * Nk / elapsedTime);
     }
-    // return 0;
+    return 0;
   }
   return 0;
 }

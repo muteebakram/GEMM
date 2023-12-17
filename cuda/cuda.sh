@@ -3,7 +3,7 @@
 GCC=nvcc
 
 # OUTPUT=
-OUTPUT="results/CADE_results.txt"
+OUTPUT="CADE_results.txt"
 
 if [ ! -z "${OUTPUT}" ]; then
   # mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
@@ -20,12 +20,12 @@ function run() {
 
 # Multiple sizes
 run $((8 * 1024)) $((8 * 1024)) 16
-run 4096 4096 64
-run 2048 2048 256
-run 1024 1024 1024
-run 256 256 $((16 * 1024))
-run 64 64 $((256 * 1024))
-run 16 16 $((4 * 1024 * 1024))
+# run 4096 4096 64
+# run 2048 2048 256
+# run 1024 1024 1024
+# run 256 256 $((16 * 1024))
+# run 64 64 $((256 * 1024))
+# run 16 16 $((4 * 1024 * 1024))
 
 # Non multiple sizes
 # run $((9 * 999)) $((9 * 999)) 37

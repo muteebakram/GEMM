@@ -3,8 +3,8 @@
 GCC=gcc
 # GCC=/opt/homebrew/Cellar/llvm/17.0.4/bin/clang # Macbook Apple Silicon
 
-OUTPUT=
-# OUTPUT=ABt_result_new.txt
+# OUTPUT=
+OUTPUT=cade_results.txt
 
 if [ ! -z "${OUTPUT}" ]; then
   # mv $OUTPUT ABt_result_prev.txt # Compare previous run with new run.
@@ -29,9 +29,9 @@ run 64 64 $((256 * 1024))
 run 16 16 $((4 * 1024 * 1024))
 
 # Non multiple sizes
-# run $((9 * 999)) $((9 * 999)) 37
-# run $((3 * 999)) $((3 * 999)) 111
-# run 999 999 999
-# run 333 333 $((9 * 999))
-# run 111 111 $((81 * 999))
-# run 37 37 $((81 * 999))
+run $((9 * 999)) $((9 * 999)) 37
+run $((3 * 999)) $((3 * 999)) 111
+run 999 999 999
+run 333 333 $((9 * 999))
+run 111 111 $((81 * 999))
+run 37 37 $((81 * 999))
