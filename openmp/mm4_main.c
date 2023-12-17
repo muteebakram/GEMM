@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   nthreads[2] = max_threads - 1;
   for (int version = 0; version < 4; version++)
   {
-    version = 3;
+    // version = 1;
     printf("\n");
     switch (version)
     {
@@ -209,16 +209,16 @@ int main(int argc, char *argv[])
     switch (version)
     {
     case 0:
-      printf("\t Performance of parallel version for AB (in GFLOPS) ");
+      printf("         Performance of parallel version for AB (in GFLOPS) ");
       break;
     case 1:
-      printf("\t Performance of parallel version for ATB (in GFLOPS) ");
+      printf("         Performance of parallel version for ATB (in GFLOPS) ");
       break;
     case 2:
-      printf("\t Performance of parallel version for ABT (in GFLOPS) ");
+      printf("         Performance of parallel version for ABT (in GFLOPS) ");
       break;
     case 3:
-      printf("\t Performance of parallel version for ATBT (in GFLOPS) ");
+      printf("         Performance of parallel version for ATBT (in GFLOPS) ");
       break;
     }
     for (nt = 0; nt < num_cases - 1; nt++)
@@ -234,14 +234,14 @@ int main(int argc, char *argv[])
     // for (nt = 0; nt < num_cases; nt++)
     //   printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / maxt_par[nt]);
 
-    printf("\t Best Performance  (GFLOPS || Speedup): ");
+    printf("         Best Performance  (GFLOPS || Speedup): ");
     for (nt = 0; nt < num_cases; nt++)
       printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / mint_par[nt]);
     printf("|| ");
     for (nt = 0; nt < num_cases; nt++)
       printf("%.2f ", maxt_seq / mint_par[nt]);
 
-    printf("\n\t Worst Performance (GFLOPS || Speedup): ");
+    printf("\n         Worst Performance (GFLOPS || Speedup): ");
     for (nt = 0; nt < num_cases; nt++)
       printf("%.2f ", 2.0e-9 * Ni * Nj * Nk / maxt_par[nt]);
     printf("|| ");
@@ -249,6 +249,6 @@ int main(int argc, char *argv[])
       printf("%.2f ", mint_seq / maxt_par[nt]);
 
     printf("\n");
-    return 0;
+    // return 0;
   }
 }
