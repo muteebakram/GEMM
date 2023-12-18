@@ -1,8 +1,7 @@
 #define BLOCK_SIZE 16
 
-__global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
+__global__ void abT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = 4 * (blockIdx.y * blockDim.y + ty);
@@ -80,9 +79,8 @@ __global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B
   }
 }
 
-__global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
+__global__ void abT_gpu_2(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = blockIdx.y * blockDim.y + ty;
@@ -91,30 +89,30 @@ __global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__
   if ((i < Ni) && (j < Nj))
   {
     float sum00 = 0;
-    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[BLOCK_SIZE][16 * BLOCK_SIZE];
+    __shared__ float sA1[BLOCK_SIZE][16 * BLOCK_SIZE], sB1[16 * BLOCK_SIZE][BLOCK_SIZE];
 
     for (int ks = 0; ks < Nk; ks += 16 * BLOCK_SIZE)
     {
+      int indexA = i * Nk + ks + tx;
       for (int m = 0; m < 16; m++)
       {
-        sA1[ty][tx + m * BLOCK_SIZE] = A[i * Nk + ks + tx + m * BLOCK_SIZE];
-        sB1[tx][ty + m * BLOCK_SIZE] = B[j * Nk + ks + ty + m * BLOCK_SIZE];
-        // sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
+        int m_jump = m * BLOCK_SIZE;
+        sA1[ty][tx + m_jump] = A[indexA + m_jump];
+        sB1[ty + m_jump][tx] = B[j * Nk + ks + ty + m_jump];
       }
       __syncthreads();
 
       for (int k = 0; k < 16 * BLOCK_SIZE; k += 8)
       {
-        // C[i][j] = C[i][j] + A[i][k]*B[j][k];
-        sum00 += sA1[ty][k] * sB1[tx][k];
-        sum00 += sA1[ty][k + 1] * sB1[tx][k + 1];
-        sum00 += sA1[ty][k + 2] * sB1[tx][k + 2];
-        sum00 += sA1[ty][k + 3] * sB1[tx][k + 3];
+        sum00 += sA1[ty][k] * sB1[k][tx];
+        sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
+        sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];
+        sum00 += sA1[ty][k + 3] * sB1[k + 3][tx];
 
-        sum00 += sA1[ty][k + 4] * sB1[tx][k + 4];
-        sum00 += sA1[ty][k + 5] * sB1[tx][k + 5];
-        sum00 += sA1[ty][k + 6] * sB1[tx][k + 6];
-        sum00 += sA1[ty][k + 7] * sB1[tx][k + 7];
+        sum00 += sA1[ty][k + 4] * sB1[k + 4][tx];
+        sum00 += sA1[ty][k + 5] * sB1[k + 5][tx];
+        sum00 += sA1[ty][k + 6] * sB1[k + 6][tx];
+        sum00 += sA1[ty][k + 7] * sB1[k + 7][tx];
       }
       __syncthreads();
     }
@@ -122,48 +120,95 @@ __global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__
     C[i * Nj + j] = sum00;
   }
 }
-
-__global__ void abT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
+__global__ void abT_gpu_3(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
-  // Coalesced memory access for A, C
   int tx = threadIdx.x;
   int ty = threadIdx.y;
   int i = blockIdx.y * blockDim.y + threadIdx.y;
   int j = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if ((i < Ni) && (j < Nj))
+  float sum00 = 0;
+  __shared__ float sA[BLOCK_SIZE][BLOCK_SIZE], sB[BLOCK_SIZE][BLOCK_SIZE];
+
+  int ks_end = ceil(Nk / float(BLOCK_SIZE));
+  for (int ks = 0; ks < ks_end; ks++)
   {
-    float sum00 = 0;
-    __shared__ float sA1[BLOCK_SIZE][BLOCK_SIZE], sB1[BLOCK_SIZE][BLOCK_SIZE];
+    int k_jump = ks * BLOCK_SIZE;
 
-    int rem = Nk % BLOCK_SIZE;
-    for (int k = 0; k < rem; k++)
-      sum00 += A[i * Nk + k] * B[k * Nj + j];
+    if (i < Ni && (k_jump + tx < Nk))
+      sA[ty][tx] = A[i * Nk + k_jump + tx];
+    else
+      sA[ty][tx] = 0;
 
-    for (int ks = rem; ks < Nk; ks += BLOCK_SIZE)
+    if (j < Nj && (k_jump + ty < Nk))
+      sB[ty][tx] = B[j * Nk + k_jump + ty];
+    else
+      sB[ty][tx] = 0;
+
+    __syncthreads();
+
+    for (int k = 0; k < BLOCK_SIZE; k++)
     {
-      for (int m = 0; m < 1; m++)
-      {
-        sA1[ty][tx + m * BLOCK_SIZE] = A[i * Nk + ks + tx + m * BLOCK_SIZE];
-        sB1[ty + m * BLOCK_SIZE][tx] = B[(ks + m * BLOCK_SIZE + ty) * Nj + j];
-      }
-      __syncthreads();
-
-      for (int k = 0; k < BLOCK_SIZE; k++)
-      {
-        // C[i][j] = C[i][j] + A[i][k]*B[j][k];
-        sum00 += sA1[ty][k] * sB1[k][tx];
-        // sum00 += sA1[ty][k + 1] * sB1[k + 1][tx];
-        // sum00 += sA1[ty][k + 2] * sB1[k + 2][tx];
-        // sum00 += sA1[ty][k + 3] * sB1[k + 3][tx];
-
-        // sum00 += sA1[ty][k + 4] * sB1[k + 4][tx];
-        // sum00 += sA1[ty][k + 5] * sB1[k + 5][tx];
-        // sum00 += sA1[ty][k + 6] * sB1[k + 6][tx];
-        // sum00 += sA1[ty][k + 7] * sB1[k + 7][tx];
-      }
-      __syncthreads();
+      sum00 += sA[ty][k] * sB[k][tx];
+      // sum00 += sA[ty][k + 1] * sB[k + 1][tx];
+      // sum00 += sA[ty][k + 2] * sB[k + 2][tx];
+      // sum00 += sA[ty][k + 3] * sB[k + 3][tx];
     }
-    C[i * Nj + j] = sum00;
+    __syncthreads();
   }
+
+  if (i < Ni && j < Nj)
+    C[i * Nj + j] = sum00;
+}
+
+__global__ void abT_gpu_4(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
+{
+  int tx = threadIdx.x;
+  int ty = threadIdx.y;
+  int i = blockIdx.y * blockDim.y + threadIdx.y;
+  int j = blockIdx.x * blockDim.x + threadIdx.x;
+
+  int TILE = 16;
+  float sum00 = 0;
+  __shared__ float sA[BLOCK_SIZE][16 * BLOCK_SIZE], sB[16 * BLOCK_SIZE][BLOCK_SIZE];
+
+  int ks_end = ceil(Nk / float(TILE * BLOCK_SIZE));
+  for (int ks = 0; ks < ks_end; ks++)
+  {
+    int k_jump = ks * TILE * BLOCK_SIZE;
+    for (int m = 0; m < TILE; m++)
+    {
+      int m_jump = m * BLOCK_SIZE;
+      int km_jump = k_jump + m_jump;
+
+      if (i < Ni && (km_jump + tx < Nk))
+        sA[ty][tx + m_jump] = A[i * Nk + km_jump + tx];
+      else
+        sA[ty][tx + m_jump] = 0;
+
+      if (j < Nj && (km_jump + ty < Nk))
+        sB[ty + m_jump][tx] = B[j * Nk + km_jump + ty];
+      else
+        sB[ty + m_jump][tx] = 0;
+    }
+
+    __syncthreads();
+
+    for (int k = 0; k < TILE * BLOCK_SIZE; k += 8)
+    {
+      sum00 += sA[ty][k] * sB[k][tx];
+      sum00 += sA[ty][k + 1] * sB[k + 1][tx];
+      sum00 += sA[ty][k + 2] * sB[k + 2][tx];
+      sum00 += sA[ty][k + 3] * sB[k + 3][tx];
+
+      sum00 += sA[ty][k + 4] * sB[k + 4][tx];
+      sum00 += sA[ty][k + 5] * sB[k + 5][tx];
+      sum00 += sA[ty][k + 6] * sB[k + 6][tx];
+      sum00 += sA[ty][k + 7] * sB[k + 7][tx];
+    }
+    __syncthreads();
+  }
+
+  if (i < Ni && j < Nj)
+    C[i * Nj + j] = sum00;
 }

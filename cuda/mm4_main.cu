@@ -9,21 +9,25 @@ void checkCUDAError(const char *msg);
 cudaEvent_t start, stop;
 float tstart, elapsedTime;
 
-__global__ void ab_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void ab16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void ab_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void ab_gpu_2(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void ab_gpu_3(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void ab_gpu_4(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
-__global__ void aTb_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void aTb16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTb_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTb_gpu_2(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTb_gpu_3(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTb_gpu_4(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
-__global__ void abT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void abT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void abT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void abT_gpu_2(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void abT_gpu_3(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void abT_gpu_4(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
-__global__ void aTbT_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
-__global__ void aTbT16_gpu(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 __global__ void aTbT_gpu_1(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTbT_gpu_2(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTbT_gpu_3(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
+__global__ void aTbT_gpu_4(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk);
 
 void ab_seq(const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C, int Ni, int Nj, int Nk)
 {
@@ -77,13 +81,13 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     {
       dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
       // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      ab_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      ab16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      ab_gpu_2<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   else
   {
@@ -91,13 +95,13 @@ void ab_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      ab_gpu_3<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      ab_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      ab_gpu_4<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   }
 }
@@ -109,28 +113,28 @@ void aTb_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     if ((Ni > 64) && (Nj > 64))
     {
       dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
-      // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTb_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      // printf("AtB Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTb16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      // printf("AtB Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_2<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   else
   {
     if ((Ni > 64) && (Nj > 64))
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTb_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      // printf("AtB Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_3<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTb_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      // printf("AtB Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      aTb_gpu_4<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   }
 }
@@ -143,27 +147,27 @@ void abT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     {
       dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
       // printf("Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      abT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      abT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      abT16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      abT_gpu_2<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   else
   {
     if ((Ni > 64) && (Nj > 64))
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
-      printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      abT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
+      abT_gpu_3<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      abT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      abT_gpu_4<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   }
 }
@@ -176,13 +180,13 @@ void aTbT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     {
       dim3 grid(ceil(Ni / (4 * float(BLOCK_SIZE))), ceil(Nj / (4 * float(BLOCK_SIZE))));
       // printf("aTbT Case 1: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTbT_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      aTbT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("aTbT Case 2: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTbT16_gpu<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      aTbT_gpu_2<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   else
   {
@@ -190,13 +194,13 @@ void aTbT_launch(float *d_A, float *d_B, float *d_C, int Ni, int Nj, int Nk)
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 3: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTbT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      aTbT_gpu_3<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
     else
     {
       dim3 grid(ceil(Ni / float(BLOCK_SIZE)), ceil(Nj / float(BLOCK_SIZE)));
       // printf("Case 4: Block size (%d, %d); Grid size (%d, %d)\n", block.x, block.y, grid.x, grid.y);
-      aTbT_gpu_1<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
+      aTbT_gpu_4<<<grid, block>>>(d_A, d_B, d_C, Ni, Nj, Nk);
     }
   }
 }
@@ -218,7 +222,7 @@ int main(int argc, char *argv[])
   Ni = atoi(argv[1]);
   Nj = atoi(argv[2]);
   Nk = atoi(argv[3]);
-  printf("_______________________________________________________________________________________\n");
+  printf("_______________________________________________________________________________________\n\n");
   printf("Matrix dimension Ni: %d, Nj %d, Nk: %d\n", Ni, Nj, Nk);
 
   h_A = (float *)malloc(sizeof(float) * Ni * Nk);
@@ -250,7 +254,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < Nj; j++)
         h_Cref[i * Nj + j] = 0;
 
-    version = 3;
+    // version = 3;
     switch (version)
     {
     case 0:
@@ -313,28 +317,28 @@ int main(int argc, char *argv[])
         if (fabs((h_C[i] - h_Cref[i]) / h_Cref[i]) > threshold)
         {
           printf("Error: mismatch at linearized index %d, was: %f, should be: %f\n", i, h_C[i], h_Cref[i]);
-          printf("\nOutput\n\n");
-          int DSIZE = 32;
-          for (int p = 0; p < DSIZE * DSIZE; p++)
-          {
-            printf("%.0f  ", h_C[p]);
-            if (p != 0 && p % DSIZE == 0)
-              printf("\n");
-          }
-          printf("\n");
-          printf("\nReference\n");
-          printf("\n");
-          for (int p = 0; p < DSIZE * DSIZE; p++)
-          {
-            printf("%.0f  ", h_Cref[p]);
-            if (p != 0 && p % DSIZE == 0)
-              printf("\n");
-          }
+          // printf("\nOutput\n\n");
+          // int DSIZE = 32;
+          // for (int p = 0; p < DSIZE * DSIZE; p++)
+          // {
+          //   printf("%.0f  ", h_C[p]);
+          //   if (p != 0 && p % DSIZE == 0)
+          //     printf("\n");
+          // }
+          // printf("\n");
+          // printf("\nReference\n");
+          // printf("\n");
+          // for (int p = 0; p < DSIZE * DSIZE; p++)
+          // {
+          //   printf("%.0f  ", h_Cref[p]);
+          //   if (p != 0 && p % DSIZE == 0)
+          //     printf("\n");
+          // }
           return -1;
         }
       printf("GFLOPS: %.2f\n", 2.0e-6 * Ni * Nj * Nk / elapsedTime);
     }
-    return 0;
+    // return 0;
   }
   return 0;
 }
